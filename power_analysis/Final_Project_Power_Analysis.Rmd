@@ -1,0 +1,95 @@
+---
+title: "Power Analysis for Final Project"
+author: "Cynthia, Emanuel, Jonathan, and Rina "
+date: "02/14/2024"
+name: "Rina Palta"
+output: 
+  pdf_document: 
+    number_sections: true
+---
+
+```{r global options, include = FALSE}
+knitr::opts_chunk$set(include = FALSE, message = FALSE, warning = FALSE )
+
+knitr::knit_engines$set(problem_description = function(options) {
+  code <- paste(options$code, collapse = "\n")
+})
+```
+
+```{r package loads, warning=FALSE, message=FALSE}
+library(data.table)
+library(sandwich)
+library(lmtest)
+
+library(ggplot2)
+library(knitr)
+```
+
+Sleep score ranges from 0-100, with most sleep scores falling in the 60-85 range. We could do a normally distributed variable centered at 72, with a standard error of 6. And if we're looking for an ATE of 3, for the treatment group, we can shift that distribution up by 3, keeping the distribution for the control group the same. 
+
+
+```{r}
+d <- data.table()
+
+d[ , condition := rep(c('control', 'treatment'), each = 100)]
+d[condition == 'control', Y := rnorm(.N, mean = 72, sd = 6)]
+d[condition == 'treatment', Y := rnorm(.N, mean = 75, sd = 6)]
+
+d[ , t.test(Y ~ condition)]
+```
+```{r}
+d
+```
+
+
+The true ATE in our 200-person sample is 1.89, with a 95% confidence interval of .29 to .3.48. 
+
+Simulating the experiment at different sample sizes, from 10 - 200% of our datatable will give us an idea of what the power of our experiment will be at different sample sizes. 
+
+```{r}
+
+# vector of percentages to sample
+percentages_to_sample <- seq(0.10, 2.00, by = 0.10)
+
+# empty vector to store the power calculations at every sample size
+power_results <- rep(NA, length(percentages_to_sample))
+
+# number of observations in the original dataset
+n_obs <- nrow(d)
+
+# loop through percentages to sample
+for (j in seq_along(percentages_to_sample)) {
+  # calculate the sample size for each group, control and treatment
+  sample_size <- round(percentages_to_sample[j] * n_obs) / 2
+  
+  # empty vector to store the p-values at the current sample size
+  t_test_p_values <- rep(NA, 1000) 
+  
+  # run the experiment at the current sample size 1000 times and store the 1000 p-values created from each t-test
+  for (i in 1:1000) {
+    # sample from treatment and control--half in treatment and half in control
+    sample_treatment <- d[condition == 'treatment'][sample(.N, sample_size, replace = TRUE)]
+    sample_control <- d[condition == 'control'][sample(.N, sample_size, replace = TRUE)]
+    
+    # combine treatment and control groups
+    next_t_test <- rbindlist(list(sample_treatment, sample_control))
+    
+    # perform t-test
+    next_test_result <- next_t_test[ , t.test(Y ~ condition)]
+    
+    # store the p-value
+    t_test_p_values[i] <- next_test_result$p.value
+  }
+  
+  # Calculate power and store in power_results
+  power_results[j] <- mean(t_test_p_values <= 0.05)
+}
+
+
+```
+
+```{r}
+plot(power_results_table$sample_size, power_results_table$test_power)
+
+```
+

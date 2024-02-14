@@ -88,9 +88,19 @@ for (j in seq_along(percentages_to_sample)) {
 
 ```
 
+
 ```{r}
-plot(power_results_table$sample_size, power_results_table$test_power)
+power_results_table <- data.table()
+```
+
+```{r}
+power_results_table$sample_size <- percentages_to_sample * n_obs
+power_results_table$test_power <- power_results
 
 ```
 
-Note that the sample size will actually need to be half of what appears in the chart to reach the given power, since we have each subject participating in control and treatment. 
+```{r}
+plot(power_results_table$sample_size, power_results_table$test_power)
+```
+
+Note that the sample size will actually need to be half of what appears in the chart to reach the given power, since we have each subject participating in control and treatment. This was an estimate with a pretty conservative treatment effect. 

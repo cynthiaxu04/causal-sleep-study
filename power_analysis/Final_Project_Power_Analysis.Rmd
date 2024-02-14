@@ -93,3 +93,4 @@ plot(power_results_table$sample_size, power_results_table$test_power)
 
 ```
 
+Note that the sample size will actually need to be half of what appears in the chart to reach the given power, since we have each subject participating in control and treatment. 

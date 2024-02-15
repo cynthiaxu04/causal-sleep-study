@@ -25,7 +25,7 @@ library(ggplot2)
 library(knitr)
 ```
 
-Sleep score ranges from 0-100, with most sleep scores falling in the 60-85 range. We could do a normally distributed variable centered at 72, with a standard error of 6. And if we're looking for an ATE of 3, for the treatment group, we can shift that distribution up by 3, keeping the distribution for the control group the same. 
+Sleep score ranges from 0-100, with most sleep scores falling in the 60-85 range. Our Yi(0) is a normally distributed variable centered at 72, with a standard error of 3 to reflect this range. Because of our criss-cross design, we're adding the ATE as a normally distributed variable centered at 2 (our projected ATE) with a standard deviation of 1 to each Yi(0). So our Yi(1) = Yi(0) + tau-i
 
 
 ```{r}
@@ -43,9 +43,6 @@ d[ , t.test(Y ~ condition)]
 ```{r}
 d
 ```
-
-
-The true ATE in our 200-person sample is 1.89, with a 95% confidence interval of .29 to .3.48. 
 
 Simulating the experiment at different sample sizes, from 10 - 200% of our datatable will give us an idea of what the power of our experiment will be at different sample sizes. 
 
@@ -97,6 +94,7 @@ power_results_table <- data.table()
 ```
 
 ```{r}
+#because everyone in the study will be in treatment and control, dividing our number of observations by 2
 power_results_table$sample_size <- percentages_to_sample * n_obs / 2
 power_results_table$test_power <- power_results
 
@@ -105,3 +103,5 @@ power_results_table$test_power <- power_results
 ```{r}
 plot(power_results_table$sample_size, power_results_table$test_power)
 ```
+
+We reach a power of .8 around 26-27 subjects. 

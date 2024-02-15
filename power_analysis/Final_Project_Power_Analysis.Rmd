@@ -31,9 +31,12 @@ Sleep score ranges from 0-100, with most sleep scores falling in the 60-85 range
 ```{r}
 d <- data.table()
 
-d[ , condition := rep(c('control', 'treatment'), each = 100)]
-d[condition == 'control', Y := rnorm(.N, mean = 72, sd = 6)]
-d[condition == 'treatment', Y := rnorm(.N, mean = 75, sd = 6)]
+d[ , condition := rep(c('control', 'treatment'), each = 50)]
+
+control_y <- rnorm(50, mean = 72, sd = 3)
+
+d[condition == 'control', Y := control_y]
+d[condition == 'treatment', Y := control_y + rnorm(.N, mean = 2, sd = 1)]
 
 d[ , t.test(Y ~ condition)]
 ```
@@ -94,7 +97,7 @@ power_results_table <- data.table()
 ```
 
 ```{r}
-power_results_table$sample_size <- percentages_to_sample * n_obs
+power_results_table$sample_size <- percentages_to_sample * n_obs / 2
 power_results_table$test_power <- power_results
 
 ```
@@ -102,5 +105,3 @@ power_results_table$test_power <- power_results
 ```{r}
 plot(power_results_table$sample_size, power_results_table$test_power)
 ```
-
-Note that the sample size will actually need to be half of what appears in the chart to reach the given power, since we have each subject participating in control and treatment. This was an estimate with a pretty conservative treatment effect. 

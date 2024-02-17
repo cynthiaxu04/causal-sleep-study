@@ -16,7 +16,7 @@ knitr::knit_engines$set(problem_description = function(options) {
 })
 ```
 
-```{r package loads, warning=FALSE, message=FALSE}
+```{r package loads, message=FALSE, warning=FALSE}
 library(data.table)
 library(sandwich)
 library(lmtest)
@@ -25,83 +25,305 @@ library(ggplot2)
 library(knitr)
 ```
 
-Sleep score ranges from 0-100, with most sleep scores falling in the 60-85 range. We could do a normally distributed variable centered at 72, with a standard error of 6. And if we're looking for an ATE of 3, for the treatment group, we can shift that distribution up by 3, keeping the distribution for the control group the same. 
+# Introduction
 
+Our main research question is: Does wearing sunglasses before bedtime improve sleep quality? Where sleep quality is measured via wearable technology, such as a smart watch. Sleep quality itself can be operationalized in various ways. We will be looking specifically at sleep quality as measured by
 
-```{r}
-d <- data.table()
+1.  Sleep Score. This is a proprietary metric whose calculation may vary from app to app but we are taking these differences as approximately the same.
+2.  Duration spent in REM and deep sleep. Time spent in specific stages of sleep, particularly REM and deep sleep, have been found to be essential for high quality sleep. \textit{Stages of sleep: What happens in a sleep cycle}
 
-d[ , condition := rep(c('control', 'treatment'), each = 50)]
+Our assumptions for each power scenario are:
 
-control_y <- rnorm(50, mean = 72, sd = 3)
+-   Population is normally distribution.
+-   Significance level = 0.05.
 
-d[condition == 'control', Y := control_y]
-d[condition == 'treatment', Y := control_y + rnorm(.N, mean = 2, sd = 1)]
+We simulate the experiment at different sample sizes, from 10-100 subjects by increments of 10. We run 1,000 simulations at each sample size to calculate the power. We use t-test for hypothesis testing. Note: Because we are running a paired test, each subject has a control and treatment value; for example, 10 subjects yields 10 control and 10 treatment sleep measurements.
 
-d[ , t.test(Y ~ condition)]
+```{r include=FALSE}
+# Assumptions
+control_avg_score = 75
+
+## Other parameters
+
+#significance level
+alpha = 0.05
+
+# vector of sample sizes
+sample_sizes = seq(10, 100, by = 10)
 ```
-```{r}
-d
+
+# Scenario 1 - Measurement: Sleep Score, ATE: 5
+
+For this scenario we assume:
+
+-   The average non-intervention sleep score is 75 (for scenarios 1 & 2). This is based on a small trial run of our experiment conducted with ourselves.
+-   True ATE = 5. This is also based on the trial run we conducted.
+-   Standard deviation = 5, regardless of intervention
+
+```{r echo=FALSE, include=TRUE}
+jon_control_scores = c(70, 78, 72)
+jon_treatment_scores = c(79, 85, 80)
+
+cat('Average sleep score in control phase: ', mean(jon_control_scores))
+cat('\nAverage sleep score in treatment phase: ', mean(jon_treatment_scores))
+
+cat('\nJon pilot average treatment effect: ', mean(jon_treatment_scores) - mean(jon_control_scores))
 ```
 
+```{r echo=FALSE, include=TRUE}
+# Scenario parameters
+true_ate = 5
+stdev = 5
 
-The true ATE in our 200-person sample is 1.89, with a 95% confidence interval of .29 to .3.48. 
 
-Simulating the experiment at different sample sizes, from 10 - 200% of our datatable will give us an idea of what the power of our experiment will be at different sample sizes. 
+sample_powers = NA   # Create vector to store power at different sample sizes
 
-```{r}
-
-# vector of percentages to sample
-percentages_to_sample <- seq(0.10, 2.00, by = 0.10)
-
-# empty vector to store the power calculations at every sample size
-power_results <- rep(NA, length(percentages_to_sample))
-
-# number of observations in the original dataset
-n_obs <- nrow(d)
-
-# loop through percentages to sample
-for (j in seq_along(percentages_to_sample)) {
-  # calculate the sample size for each group, control and treatment
-  sample_size <- round(percentages_to_sample[j] * n_obs) / 2
+for (i in 1:length(sample_sizes)) {
   
-  # empty vector to store the p-values at the current sample size
-  t_test_p_values <- rep(NA, 1000) 
-  
-  # run the experiment at the current sample size 1000 times and store the 1000 p-values created from each t-test
-  for (i in 1:1000) {
-    # sample from treatment and control--half in treatment and half in control
-    sample_treatment <- d[condition == 'treatment'][sample(.N, sample_size, replace = TRUE)]
-    sample_control <- d[condition == 'control'][sample(.N, sample_size, replace = TRUE)]
+  sample_size_p_values = NA # Create vector to store p-values
+
+  for (sim in 1:1000) {
+    d <- data.table() # Create empty data table
     
-    # combine treatment and control groups
-    next_t_test <- rbindlist(list(sample_treatment, sample_control))
+    # Draw from control and treatment population
+    # Paired test, treatment effect is added to control
+    d[, control:= rnorm(sample_sizes[i], mean = control_avg_score, sd = stdev)]
+    d[, treatment:= control + rnorm(sample_sizes[i], mean = true_ate, sd = stdev)]
+    # Ensure score is between 0 and 100 inclusive 
+    d[, control:= pmin(pmax(control, 0), 100)]
+    d[, treatment:= pmin(pmax(treatment, 0), 100)]
     
-    # perform t-test
-    next_test_result <- next_t_test[ , t.test(Y ~ condition)]
-    
-    # store the p-value
-    t_test_p_values[i] <- next_test_result$p.value
+    # t-test of treatment compared control scores and get p-value
+    # Store p-value in vector
+    sample_size_p_values[sim] = t.test(d[, treatment], d[, control], conf.level=1-alpha)$p.value
   }
   
-  # Calculate power and store in power_results
-  power_results[j] <- mean(t_test_p_values <= 0.05)
+  # Calculate power, proportion of p_values below our alpha
+  # Store in sample_power vector
+  sample_powers[i] = mean(sample_size_p_values < alpha)
+
 }
 
+# Show sample sizes and powers
+ate_5 <- data.table(sample_sizes, sample_powers)
+ate_5
+
+#scenario power
+power_1 <- ate_5[sample_sizes == 20, sample_powers]
+```
+
+In this scenario, we are able to achieve a power of `r ate_5[sample_sizes == 20, sample_powers]` with a sample size of 20.
+
+# Scenario 2 - Measurement: Sleep Score, ATE: 3
+
+For this scenario we assume:
+
+-   The average non-intervention sleep score is 75 (for scenarios 1 & 2). This is based on a small trial run of our experiment conducted with ourselves.
+-   True ATE = 3
+-   Standard deviation = 3, regardless of intervention
+
+```{r echo=FALSE, include=TRUE}
+# Scenario parameters
+true_ate = 3
+stdev = 3
+
+sample_powers = NA   # Create vector to store power at different sample sizes
+
+for (i in 1:length(sample_sizes)) {
+  
+  sample_size_p_values = NA # Create vector to store p-values
+
+  for (sim in 1:1000) {
+    d <- data.table() # Create empty data table
+    
+    # Draw from control and treatment population
+    # Paired test, treatment effect is added to control
+    d[, control:= rnorm(sample_sizes[i], mean = control_avg_score, sd = stdev)]
+    d[, treatment:= control + rnorm(sample_sizes[i], mean = true_ate, sd = stdev)]
+    # Ensure score is between 0 and 100 inclusive 
+    d[, control:= pmin(pmax(control, 0), 100)]
+    d[, treatment:= pmin(pmax(treatment, 0), 100)]    
+    
+    # t-test of treatment compared control scores and get p-value
+    # Store p-value in vector
+    sample_size_p_values[sim] = t.test(d[, treatment], d[, control], conf.level=1-alpha)$p.value
+  }
+  
+  # Calculate power, proportion of p_values below our alpha
+  # Store in sample_power vector
+  sample_powers[i] = mean(sample_size_p_values < alpha)
+
+}
+
+# Show sample sizes and powers
+ate_3 <- data.table(sample_sizes, sample_powers)
+ate_3
+```
+
+In this scenario, we are able to achieve a power of `r ate_3[sample_sizes == 20, sample_powers]` with a sample size of 20.
+
+# Scenario 3 - Measurement: Deep & REM sleep, ATE: 0.15 & 0.26, respectively
+
+For this scenario we assume:
+
+-   The average non-intervention deep sleep phase as a percentage of total sleep is approximately 15%.
+-   The average non-intervention REM sleep phase as a percentage of total sleep is approximately 26%.
+-   The true ATE of deep sleep is 0.185.
+-   The true ATE of REM sleep is 0.25.
+-   Standard deviation of deep sleep = 6%, regardless of intervention.
+-   Standard deviation of REM sleep = 8%, regardless of intervention.
+
+```{r eval=FALSE, include=FALSE}
+# Define the mean and standard deviation of deep sleep and total sleep time
+mean_deep_sleep <- 69.4
+sd_deep_sleep <- 27.3
+mean_total_sleep <- 456.8
+sd_total_sleep <- 21.0
+
+# Calculate the percentage of deep sleep relative to total sleep time
+# Deep sleep percentage = (Deep sleep / Total sleep) * 100
+deep_sleep_percentage <- (mean_deep_sleep / mean_total_sleep) * 100
+
+# Use the formula for propagating errors to calculate the standard deviation of the percentage
+# Reference: https://en.wikipedia.org/wiki/Propagation_of_uncertainty#Example_formulas
+sd_deep_sleep_percentage <- deep_sleep_percentage * sqrt((sd_deep_sleep/mean_deep_sleep)^2 + (sd_total_sleep/mean_total_sleep)^2)
+
+# Print the result
+cat("Average deep sleep as a percentage of total sleep time:", round(deep_sleep_percentage, 2), "%\n")
+cat("Standard deviation of deep sleep percentage:", round(sd_deep_sleep_percentage, 2), "%\n")
+```
+
+```{r eval=FALSE, include=FALSE}
+# Define the mean and standard deviation of deep sleep and total sleep time
+mean_rem_sleep <- 120
+sd_rem_sleep <- 37.8
+mean_total_sleep <- 456.8
+sd_total_sleep <- 21.0
+
+# Calculate the percentage of deep sleep relative to total sleep time
+# Deep sleep percentage = (Deep sleep / Total sleep) * 100
+rem_sleep_percentage <- (mean_rem_sleep / mean_total_sleep) * 100
+
+# Use the formula for propagating errors to calculate the standard deviation of the percentage
+# Reference: https://en.wikipedia.org/wiki/Propagation_of_uncertainty#Example_formulas
+sd_rem_sleep_percentage <- rem_sleep_percentage * sqrt((sd_rem_sleep/mean_rem_sleep)^2 + (sd_total_sleep/mean_total_sleep)^2)
+
+# Print the result
+cat("Average REM sleep as a percentage of total sleep time:", round(rem_sleep_percentage, 2), "%\n")
+cat("Standard deviation of REM sleep percentage:", round(sd_rem_sleep_percentage, 2), "%\n")
 
 ```
 
+All of these values are based on a study conducted that compared consumer sleep-tracking devices to laboratory standards \textit{Chinoy, E, et al.}.
 
-```{r}
-power_results_table <- data.table()
+```{r echo=FALSE, include=TRUE}
+# Scenario parameters
+true_ate = 0.185
+stdev = 6
+
+sample_powers = NA   # Create vector to store power at different sample sizes
+
+for (i in 1:length(sample_sizes)) {
+  
+  sample_size_p_values = NA # Create vector to store p-values
+
+  for (sim in 1:1000) {
+    d <- data.table() # Create empty data table
+    
+    # Draw from control and treatment population
+    # Paired test, treatment effect is added to control
+    d[, control:= rnorm(sample_sizes[i], mean = control_avg_score, sd = stdev)]
+    d[, treatment:= control + rnorm(sample_sizes[i], mean = true_ate, sd = stdev)]
+    # Ensure score is between 0 and 100 inclusive 
+    d[, control:= pmin(pmax(control, 0), 100)]
+    d[, treatment:= pmin(pmax(treatment, 0), 100)]    
+    
+    # t-test of treatment compared control scores and get p-value
+    # Store p-value in vector
+    sample_size_p_values[sim] = t.test(d[, treatment], d[, control], conf.level=1-alpha)$p.value
+  }
+  
+  # Calculate power, proportion of p_values below our alpha
+  # Store in sample_power vector
+  sample_powers[i] = mean(sample_size_p_values < alpha)
+
+}
+
+# Show sample sizes and powers
+ate_deep <- data.table(sample_sizes, sample_powers)
+ate_deep
 ```
 
-```{r}
-power_results_table$sample_size <- percentages_to_sample * n_obs / 2
-power_results_table$test_power <- power_results
+```{r echo=FALSE, include=TRUE}
+# Scenario parameters
+true_ate = 0.25
+stdev = 8
 
+sample_powers = NA   # Create vector to store power at different sample sizes
+
+for (i in 1:length(sample_sizes)) {
+  
+  sample_size_p_values = NA # Create vector to store p-values
+
+  for (sim in 1:1000) {
+    d <- data.table() # Create empty data table
+    
+    # Draw from control and treatment population
+    # Paired test, treatment effect is added to control
+    d[, control:= rnorm(sample_sizes[i], mean = control_avg_score, sd = stdev)]
+    d[, treatment:= control + rnorm(sample_sizes[i], mean = true_ate, sd = stdev)]
+    # Ensure score is between 0 and 100 inclusive 
+    d[, control:= pmin(pmax(control, 0), 100)]
+    d[, treatment:= pmin(pmax(treatment, 0), 100)]    
+    
+    # t-test of treatment compared control scores and get p-value
+    # Store p-value in vector
+    sample_size_p_values[sim] = t.test(d[, treatment], d[, control], conf.level=1-alpha)$p.value
+  }
+  
+  # Calculate power, proportion of p_values below our alpha
+  # Store in sample_power vector
+  sample_powers[i] = mean(sample_size_p_values < alpha)
+
+}
+
+# Show sample sizes and powers
+ate_rem <- data.table(sample_sizes, sample_powers)
+ate_rem
+```
+Unfortunately, we have extremely low statistical power if using percentage of REM or deep sleep phases as our main readout metric. It is unlikely we can feasibly go this route.
+
+# Plot of Achieved Power
+
+Comparing the powers of each scenario, we plot:
+
+```{r echo=FALSE, include=TRUE}
+#list of data.tables
+data_tables <- list(ate_5, ate_3, ate_rem)
+
+combined_data <- do.call(rbind, data_tables)
+combined_data$dataset <- rep(1:length(data_tables), sapply(data_tables, nrow))
+
+# Plot combined data with grouping
+ggplot(combined_data, aes(x = sample_sizes, y = sample_powers, group = dataset, color = as.factor(dataset))) +
+  geom_smooth(method = "loess") +
+  geom_point() +
+  geom_hline(yintercept = 0.8, linetype = "dashed", color = "red") + 
+  labs(x = "Sample Size", y = "Power", title = "Power Analysis", color = "Scenario") +
+  theme(legend.title = element_text(face="bold"))
 ```
 
-```{r}
-plot(power_results_table$sample_size, power_results_table$test_power)
+```{=tex}
+\section{References}
+\begin{small}
+\begin{itemize}
+\item[] Evan D Chinoy, Joseph A Cuellar, Kirbie E Huwa, Jason T Jameson, Catherine H Watson, Sara C Bessman, Dale A Hirsch, Adam D Cooper, Sean P A Drummond, Rachel R Markwald, Performance of seven consumer sleep-tracking devices compared with polysomnography, Sleep, Volume 44, Issue 5, May 2021, zsaa291, \url{https://doi.org/10.1093/sleep/zsaa291}
+
+\item[] Miller DJ, Sargent C, Roach GD. A Validation of Six Wearable Devices for Estimating Sleep, Heart Rate and Heart Rate Variability in Healthy Adults. Sensors. 2022; 22(16):6317.
+\url{https://doi.org/10.3390/s22166317}
+
+\item[] Suni, E., Singh, A. (2023, December 8). Stages of sleep: What happens in a sleep cycle. Sleep Foundation. \url{https://www.sleepfoundation.org/stages-of-sleep} 
+
+\end{itemize}
+\end{small}
 ```

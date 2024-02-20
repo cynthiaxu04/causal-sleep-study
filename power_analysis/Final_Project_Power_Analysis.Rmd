@@ -64,6 +64,7 @@ For this scenario we assume:
 jon_control_scores = c(70, 78, 72)
 jon_treatment_scores = c(79, 85, 80)
 
+
 cat('Average sleep score in control phase: ', mean(jon_control_scores))
 cat('\nAverage sleep score in treatment phase: ', mean(jon_treatment_scores))
 
@@ -262,7 +263,6 @@ cat("Standard deviation of REM sleep percentage:", round(sd_rem_sleep_percentage
 
 ```
 
-
 ```{r echo=FALSE, include=TRUE}
 # Scenario parameters
 true_ate = 0.185
@@ -359,6 +359,7 @@ ggplot(combined_data, aes(x = sample_sizes, y = sample_powers, group = dataset, 
   labs(x = "Sample Size", y = "Power", title = "Power Analysis", color = "Scenario") +
   theme(legend.title = element_text(face="bold"))
 ```
+We reach a power of .8 around 26-27 subjects. 
 
 ```{=tex}
 \section{References}
@@ -376,3 +377,5 @@ ggplot(combined_data, aes(x = sample_sizes, y = sample_powers, group = dataset, 
 \end{itemize}
 \end{small}
 ```
+
+

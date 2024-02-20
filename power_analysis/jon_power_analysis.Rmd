@@ -1,0 +1,198 @@
+---
+title: "Power Analysis for Final Project"
+author: "Cynthia, Emanuel, Jonathan, and Rina "
+output: 
+  pdf_document: 
+    number_sections: true
+---
+
+```{r global options, include = FALSE}
+knitr::opts_chunk$set(include = FALSE, message = FALSE, warning = FALSE )
+
+knitr::knit_engines$set(problem_description = function(options) {
+  code <- paste(options$code, collapse = "\n")
+})
+```
+
+```{r package loads, warning=FALSE, message=FALSE}
+library(data.table)
+library(sandwich)
+library(lmtest)
+
+library(ggplot2)
+library(knitr)
+```
+
+My scores
+
+-   No sunglasses: Wed 2/7 - Fri 2/9
+
+-   Sunglasses: Wed 2/14 - Fri 2/16
+
+```{r}
+jon_control_scores = c(70, 78, 72)
+jon_treatment_scores = c(79, 85, 80)
+
+mean(jon_control_scores)
+mean(jon_treatment_scores)
+
+cat('Jon pilot average treatment effect: ', mean(jon_treatment_scores) - mean(jon_control_scores))
+
+```
+
+**Assume for population for each scenario**
+
+-   Normal distribution
+
+-   Average non-intervention sleep score 75
+
+We simulate the experiment at different sample sizes, from 10-100 subjects by increments of 10. We run 1,000 simulations at each sample size to calculate the power. Note: Because we are running a paired test, each subject has a control and treatment value; for example, 10 subjects yields 10 control and 10 treatment sleep scores.
+
+```{r}
+# Assumptions
+control_avg_score = 75
+
+## Other parameters
+
+#significance level
+alpha = 0.05
+
+# vector of sample sizes
+sample_sizes = seq(10, 100, by = 10)
+```
+
+## **Scenario #1: Base Case**
+
+-   True ATE = 5
+
+-   Standard deviation = 5, regardless of intervention
+
+```{r}
+# Scenario parameters
+true_ate = 5
+stdev = 5
+
+
+sample_powers = NA   # Create vector to store power at different sample sizes
+
+for (i in 1:length(sample_sizes)) {
+  
+  sample_size_p_values = NA # Create vector to store p-values
+
+  for (sim in 1:1000) {
+    d <- data.table() # Create empty data table
+    
+    # Draw from control and treatment population
+    # Paired test, treatment effect is added to control
+    d[, control:= rnorm(sample_sizes[i], mean = control_avg_score, sd = stdev)]
+    d[, treatment:= control + rnorm(sample_sizes[i], mean = true_ate, sd = stdev)]
+    # Ensure score is between 0 and 100 inclusive 
+    d[, control:= pmin(pmax(control, 0), 100)]
+    d[, treatment:= pmin(pmax(treatment, 0), 100)]
+    
+    # t-test of treatment compared control scores and get p-value
+    # Store p-value in vector
+    sample_size_p_values[sim] = t.test(d[, treatment], d[, control], conf.level=1-alpha)$p.value
+  }
+  
+  # Calculate power, propportion of p_values below our alpha
+  # Store in sample_power vector
+  sample_powers[i] = mean(sample_size_p_values < alpha)
+
+}
+
+# Show sample sizes and powers
+data.table(sample_sizes, sample_powers)
+```
+
+## **Scenario #1A**
+
+Same ATE, but greater standard deviation
+
+-   True ATE = 5
+
+-   Standard deviation = 10, regardless of intervention
+
+```{r}
+# Scenario parameters
+true_ate = 5
+stdev = 10
+
+sample_powers = NA   # Create vector to store power at different sample sizes
+
+for (i in 1:length(sample_sizes)) {
+  
+  sample_size_p_values = NA # Create vector to store p-values
+
+  for (sim in 1:1000) {
+    d <- data.table() # Create empty data table
+    
+    # Draw from control and treatment population
+    # Paired test, treatment effect is added to control
+    d[, control:= rnorm(sample_sizes[i], mean = control_avg_score, sd = stdev)]
+    d[, treatment:= control + rnorm(sample_sizes[i], mean = true_ate, sd = stdev)]
+    # Ensure score is between 0 and 100 inclusive 
+    d[, control:= pmin(pmax(control, 0), 100)]
+    d[, treatment:= pmin(pmax(treatment, 0), 100)]
+    
+    # t-test of treatment compared control scores and get p-value
+    # Store p-value in vector
+    sample_size_p_values[sim] = t.test(d[, treatment], d[, control], conf.level=1-alpha)$p.value
+  }
+  
+  # Calculate power, propportion of p_values below our alpha
+  # Store in sample_power vector
+  sample_powers[i] = mean(sample_size_p_values < alpha)
+
+}
+
+# Show sample sizes and powers
+data.table(sample_sizes, sample_powers)
+```
+
+## **Scenario #2**
+
+Smaller ATE
+
+-   True ATE = 3
+
+-   Standard deviation = 3, regardless of intervention
+
+```{r}
+# Scenario parameters
+true_ate = 3
+stdev = 3
+
+sample_powers = NA   # Create vector to store power at different sample sizes
+
+for (i in 1:length(sample_sizes)) {
+  
+  sample_size_p_values = NA # Create vector to store p-values
+
+  for (sim in 1:1000) {
+    d <- data.table() # Create empty data table
+    
+    # Draw from control and treatment population
+    # Paired test, treatment effect is added to control
+    d[, control:= rnorm(sample_sizes[i], mean = control_avg_score, sd = stdev)]
+    d[, treatment:= control + rnorm(sample_sizes[i], mean = true_ate, sd = stdev)]
+    # Ensure score is between 0 and 100 inclusive 
+    d[, control:= pmin(pmax(control, 0), 100)]
+    d[, treatment:= pmin(pmax(treatment, 0), 100)]    
+    
+    # t-test of treatment compared control scores and get p-value
+    # Store p-value in vector
+    sample_size_p_values[sim] = t.test(d[, treatment], d[, control], conf.level=1-alpha)$p.value
+  }
+  
+  # Calculate power, propportion of p_values below our alpha
+  # Store in sample_power vector
+  sample_powers[i] = mean(sample_size_p_values < alpha)
+
+}
+
+# Show sample sizes and powers
+data.table(sample_sizes, sample_powers)
+```
+
+**PLOT**

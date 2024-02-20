@@ -40,9 +40,9 @@ We address this with a paired test, where each subject experiences both control 
 
 ## Simulating Power
 
-The significance level is set at 0.05.
+The significance level is set at 0.05. We consider the possibility that using sunglasses may also potentially harm sleep quality, thus we conduct two-tailed t-tests.
 
-We simulate the experiment in different scenarios of true average treatment effect (ATE) and variance. For each scenario, we calculate power at different sample sizes, from 10 to 100 subjects. We run 1,000 simulations at each sample size, using a two-tailed t-test for hypothesis testing. Note: Because we are running a paired test, each subject has a control and treatment value; for example, 10 subjects yields 10 control and 10 treatment sleep measurements.
+We simulate the experiment in different scenarios of true average treatment effect (ATE) and variance. For each scenario, we calculate power at different sample sizes, from 10 to 100 subjects. We run 1,000 simulations at each sample size. Note: Because we are running a paired test, each subject has a control and treatment value; for example, 10 subjects yields 10 control and 10 treatment sleep measurements.
 
 # Sleep Score Scenarios
 
@@ -51,7 +51,7 @@ Assumptions:
 -   The mean non-intervention sleep score is 75 (for scenarios 1-4). The standard deviation of sleep scores per individual is \~7.
     -   These figures are determined by a gathering of 2-3 week sleep scores from friends of the researchers.
     -   This average is also supported by data provided by Garmin (\textit{Garmin Blog}).
--   Sleep scores are normally distributed in the population.
+-   Sleep scores are roughly normally distributed in the population. It is bound by [0-100].
 
 ```{r include=FALSE}
 #significance level

@@ -46,7 +46,7 @@ We simulate the experiment in different scenarios of true average treatment effe
 
 # Sleep Score Scenarios
 
-#### Assumptions:
+Assumptions:
 
 -   The mean non-intervention sleep score is 75 (for scenarios 1-4). The standard deviation of sleep scores per individual is \~7.
     -   These figures are determined by a gathering of 2-3 week sleep scores from friends of the researchers.
@@ -265,14 +265,7 @@ We are interested in potentially looking at other sleep metrics as measurement o
 
 For this scenario we use values from the \textit{Chinoy, E, et al.} study
 
--   The average non-intervention deep sleep phase as a percentage of total sleep is approximately 15%.
--   The average non-intervention REM sleep phase as a percentage of total sleep is approximately 26%.
--   The true ATE of deep sleep is 0.185.
--   The true ATE of REM sleep is 0.25.
--   Standard deviation of deep sleep = 6%, regardless of intervention.
--   Standard deviation of REM sleep = 8%, regardless of intervention.
-
-```{r eval=FALSE, include=FALSE}
+```{r include=FALSE}
 # Define the mean and standard deviation of deep sleep and total sleep time
 mean_deep_sleep <- 69.4
 sd_deep_sleep <- 27.3
@@ -287,12 +280,14 @@ deep_sleep_percentage <- (mean_deep_sleep / mean_total_sleep) * 100
 # Reference: https://en.wikipedia.org/wiki/Propagation_of_uncertainty#Example_formulas
 sd_deep_sleep_percentage <- deep_sleep_percentage * sqrt((sd_deep_sleep/mean_deep_sleep)^2 + (sd_total_sleep/mean_total_sleep)^2)
 
+true_ate_deep = 0.185/ 456.8 * 100
+
 # Print the result
 cat("Average deep sleep as a percentage of total sleep time:", round(deep_sleep_percentage, 2), "%\n")
 cat("Standard deviation of deep sleep percentage:", round(sd_deep_sleep_percentage, 2), "%\n")
 ```
 
-```{r eval=FALSE, include=FALSE}
+```{r include=FALSE}
 # Define the mean and standard deviation of deep sleep and total sleep time
 mean_rem_sleep <- 120
 sd_rem_sleep <- 37.8
@@ -307,16 +302,25 @@ rem_sleep_percentage <- (mean_rem_sleep / mean_total_sleep) * 100
 # Reference: https://en.wikipedia.org/wiki/Propagation_of_uncertainty#Example_formulas
 sd_rem_sleep_percentage <- rem_sleep_percentage * sqrt((sd_rem_sleep/mean_rem_sleep)^2 + (sd_total_sleep/mean_total_sleep)^2)
 
+true_ate_rem = 0.25/ 456.8 * 100
+
 # Print the result
 cat("Average REM sleep as a percentage of total sleep time:", round(rem_sleep_percentage, 2), "%\n")
 cat("Standard deviation of REM sleep percentage:", round(sd_rem_sleep_percentage, 2), "%\n")
 
 ```
 
+-   The average non-intervention deep sleep phase as a percentage of total sleep is approximately `r round(deep_sleep_percentage, 2)`%.
+-   The average non-intervention REM sleep phase as a percentage of total sleep is approximately `r round(rem_sleep_percentage, 2)`%.
+-   The true ATE of deep sleep is 0.185 (minutes) or `r round(true_ate_deep, 2)`%.
+-   The true ATE of REM sleep is 0.25 (minutes) or `r round(true_ate_rem, 2)`%..
+-   Standard deviation of deep sleep = `r round(sd_deep_sleep_percentage, 2)`%, regardless of intervention.
+-   Standard deviation of REM sleep = `r round(sd_rem_sleep_percentage, 2)`%, regardless of intervention.
+
 ```{r echo=FALSE, include=TRUE}
 # Scenario parameters
-true_ate = 0.185
-stdev = 6
+control_avg_score = deep_sleep_percentage
+stdev = sd_deep_sleep_percentage
 
 sample_powers = NA   # Create vector to store power at different sample sizes
 
@@ -330,7 +334,7 @@ for (i in 1:length(sample_sizes)) {
     # Draw from control and treatment population
     # Paired test, treatment effect is added to control
     d[, control:= rnorm(sample_sizes[i], mean = control_avg_score, sd = stdev)]
-    d[, treatment:= control + rnorm(sample_sizes[i], mean = true_ate, sd = stdev)]
+    d[, treatment:= control + rnorm(sample_sizes[i], mean = true_ate_deep, sd = stdev)]
     # Ensure score is between 0 and 100 inclusive 
     d[, control:= pmin(pmax(control, 0), 100)]
     d[, treatment:= pmin(pmax(treatment, 0), 100)]    
@@ -353,8 +357,8 @@ ate_deep
 
 ```{r echo=FALSE, include=TRUE}
 # Scenario parameters
-true_ate = 0.25
-stdev = 8
+control_avg_score = rem_sleep_percentage
+stdev = sd_rem_sleep_percentage
 
 sample_powers = NA   # Create vector to store power at different sample sizes
 
@@ -368,7 +372,7 @@ for (i in 1:length(sample_sizes)) {
     # Draw from control and treatment population
     # Paired test, treatment effect is added to control
     d[, control:= rnorm(sample_sizes[i], mean = control_avg_score, sd = stdev)]
-    d[, treatment:= control + rnorm(sample_sizes[i], mean = true_ate, sd = stdev)]
+    d[, treatment:= control + rnorm(sample_sizes[i], mean = true_ate_rem, sd = stdev)]
     # Ensure score is between 0 and 100 inclusive 
     d[, control:= pmin(pmax(control, 0), 100)]
     d[, treatment:= pmin(pmax(treatment, 0), 100)]    
@@ -391,13 +395,101 @@ ate_rem
 
 We had some difficulty in interpreting the units of the Hedges' g effect size and how it factors into our power calculation. From these power results, we can see we have extremely low statistical power. We also looked at the deep & REM phases of our self-conducted trial study and found that the difference in means between treatment and control for time spent in deep & REM phases of sleep was also extremely small (not even one-tenth of a percentage point). It is therefore unlikely we can feasibly use these metrics for our outcome.
 
+## Scenario 6 - Deep & REM sleep meaningful ATEs
+
+```{r}
+true_ate_deep = 5 
+true_ate_rem = 7
+```
+
+In order to achieve power of around 60%-80% wot 20 to 30 people we would need the true ATE for each one of these to be:
+
+-   $ATE_{deep}$ = `r round(true_ate_deep, 2)`%.
+-   $ATE_{REM}$ = `r round(true_ate_rem, 2)`%..
+
+```{r echo=FALSE, include=TRUE}
+# Scenario parameters
+control_avg_score = deep_sleep_percentage
+stdev = sd_deep_sleep_percentage
+
+sample_powers = NA   # Create vector to store power at different sample sizes
+
+for (i in 1:length(sample_sizes)) {
+  
+  sample_size_p_values = NA # Create vector to store p-values
+
+  for (sim in 1:1000) {
+    d <- data.table() # Create empty data table
+    
+    # Draw from control and treatment population
+    # Paired test, treatment effect is added to control
+    d[, control:= rnorm(sample_sizes[i], mean = control_avg_score, sd = stdev)]
+    d[, treatment:= control + rnorm(sample_sizes[i], mean = true_ate_deep, sd = stdev)]
+    # Ensure score is between 0 and 100 inclusive 
+    d[, control:= pmin(pmax(control, 0), 100)]
+    d[, treatment:= pmin(pmax(treatment, 0), 100)]    
+    
+    # t-test of treatment compared control scores and get p-value
+    # Store p-value in vector
+    sample_size_p_values[sim] = t.test(d[, treatment], d[, control], conf.level=1-alpha)$p.value
+  }
+  
+  # Calculate power, proportion of p_values below our alpha
+  # Store in sample_power vector
+  sample_powers[i] = mean(sample_size_p_values < alpha)
+
+}
+
+# Show sample sizes and powers
+ate_deep_o <- data.table(sample_sizes, sample_powers)
+ate_deep_o
+```
+
+```{r echo=FALSE, include=TRUE}
+# Scenario parameters
+control_avg_score = rem_sleep_percentage
+stdev = sd_rem_sleep_percentage
+
+sample_powers = NA   # Create vector to store power at different sample sizes
+
+for (i in 1:length(sample_sizes)) {
+  
+  sample_size_p_values = NA # Create vector to store p-values
+
+  for (sim in 1:1000) {
+    d <- data.table() # Create empty data table
+    
+    # Draw from control and treatment population
+    # Paired test, treatment effect is added to control
+    d[, control:= rnorm(sample_sizes[i], mean = control_avg_score, sd = stdev)]
+    d[, treatment:= control + rnorm(sample_sizes[i], mean = true_ate_rem, sd = stdev)]
+    # Ensure score is between 0 and 100 inclusive 
+    d[, control:= pmin(pmax(control, 0), 100)]
+    d[, treatment:= pmin(pmax(treatment, 0), 100)]    
+    
+    # t-test of treatment compared control scores and get p-value
+    # Store p-value in vector
+    sample_size_p_values[sim] = t.test(d[, treatment], d[, control], conf.level=1-alpha)$p.value
+  }
+  
+  # Calculate power, proportion of p_values below our alpha
+  # Store in sample_power vector
+  sample_powers[i] = mean(sample_size_p_values < alpha)
+
+}
+
+# Show sample sizes and powers
+ate_rem_o <- data.table(sample_sizes, sample_powers)
+ate_rem_o
+```
+
 # Plot of Achieved Power
 
 Comparing the powers of each scenario, we plot:
 
 ```{r echo=FALSE, include=TRUE}
 #list of data.tables
-data_tables <- list(ate_s1, ate_s2, ate_s3, ate_s4, ate_rem)
+data_tables <- list(ate_s1, ate_s2, ate_s3, ate_s4, ate_rem, ate_rem_o)
 
 combined_data <- do.call(rbind, data_tables)
 combined_data$dataset <- rep(1:length(data_tables), sapply(data_tables, nrow))

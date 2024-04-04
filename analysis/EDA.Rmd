@@ -1,1 +1,56 @@
+```{r import libraries}
+library(data.table)
+library(sandwich)
+library(lmtest)
+library(ggplot2)
+library(knitr)
+library(stargazer)
+```
+
+```{r load data}
+data <- fread("../data/paired_cleaned_data.csv")
+
+#calculate average sleep scores
+data[, avg_ss_ctrl := rowMeans(.SD, na.rm = TRUE), .SDcols = c("day1_ss_ctrl", "day2_ss_ctrl", "day3_ss_ctrl", "day4_ss_ctrl")]
+data[, avg_ss_treat := rowMeans(.SD, na.rm = TRUE), .SDcols = c("day1_ss_treat", "day2_ss_treat", "day3_ss_treat", "day4_ss_treat")]
+```
+
+```{r distribution of data}
+cols_to_plot <- c("avg_ss_ctrl", "avg_ss_treat", "phase_sq_ctrl", 
+                  "phase_sq_treat", "phase_ts_ctrl", "phase_ts_treat", 
+                  "sleep_quality", "trouble_sleep", "total_sleep")
+
+for (col in cols_to_plot) {
+  hist(data[[col]], main=paste("Histogram of", col), xlab="Values", ylab="Frequency")
+}
+
+```
+
+```{r observations}
+# Observations on data:
+# Sleep scores are left-skewed (both from control and treatment phase)
+```
+
+```{r simple model}
+simple_model <- lm(avg_ss_treat ~ avg_ss_ctrl, data=data)
+
+summary(simple_model)
+```
+```{r model with total sleep, overall trouble sleeping, and overall sleep quality}
+overall_model <- lm(avg_ss_treat ~ avg_ss_ctrl + sleep_quality + trouble_sleep + total_sleep, data=data)
+
+summary(overall_model)
+```
+
+```{r model with phase Likert covariates}
+phase_model <- lm(avg_ss_treat ~ avg_ss_ctrl + phase_sq_ctrl + phase_sq_treat + phase_ts_ctrl + phase_ts_treat, data=data)
+
+summary(phase_model)
+```
+
+```{r paired t-test}
+paired_t <- t.test(data$avg_ss_ctrl, data$avg_ss_treat, paired=TRUE)
+
+print(paired_t)
+```
 

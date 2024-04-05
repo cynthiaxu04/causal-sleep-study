@@ -6,6 +6,14 @@ library(ggplot2)
 library(knitr)
 library(stargazer)
 ```
+```{r with unpaired data}
+data_2 <- fread("../data/cleaned_data.csv")
+
+data_2[, avg_ss := rowMeans(.SD, na.rm = TRUE), .SDcols = c("day1_ss", "day2_ss", "day3_ss", "day4_ss")]
+
+model <- lm(avg_ss ~ treat, data = data_2)
+summary(model)
+```
 
 ```{r load data}
 data <- fread("../data/paired_cleaned_data.csv")

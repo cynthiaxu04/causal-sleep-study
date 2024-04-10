@@ -1,0 +1,145 @@
+---
+title: "Effects of Reducing Visible Light on Sleep Quality"
+subtitle: "2024 Spring 241 Final Project"
+author: "Cynthia Xu, Emanuel Mejia, Jonathan Luo, Rina Palta"
+date: "4/18/2024"
+output:
+  pdf_document:
+    number_sections: yes
+    fig_caption: True 
+---
+
+```{r global options, include = FALSE}
+knitr::opts_chunk$set(include = FALSE, message = FALSE, warning = FALSE)
+
+knitr::knit_engines$set(problem_description = function(options) {
+  code <- paste(options$code, collapse = "\n")
+})
+```
+
+```{r import libraries, include = FALSE}
+library(data.table)
+library(sandwich)
+library(lmtest)
+library(knitr)
+library(stargazer)
+```
+
+```{r models, include=FALSE}
+data <- fread("../data/cleaned_data.csv")
+data[, avg_ss := rowMeans(.SD, na.rm = TRUE), .SDcols = c("day1_ss", "day2_ss", "day3_ss", "day4_ss")]
+
+
+model_base <- lm(avg_ss ~ treat, data = data)
+robust_base <- sqrt(diag(vcovHC(model_base, type="HC1")))
+
+model_prevsleep <- lm(avg_ss ~ treat + sleep_quality + 
+                        trouble_sleep + total_sleep, 
+                      data = data)
+robust_prevsleep <- sqrt(diag(vcovHC(model_prevsleep, type="HC1")))
+
+model_complete <- lm(
+  avg_ss ~ treat + sleep_quality + trouble_sleep + 
+    total_sleep + age_group + gender, 
+  data = data)
+robust_complete <- sqrt(diag(vcovHC(model_complete, type="HC1")))
+cluster_se <- sqrt(diag(vcovCL(model_complete, cluster = data[ , watch])))
+```
+
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+Sleep health is a fundamental aspect of maintaining general good health and cognitive performance [2]. We are interested in the effect of visible light on sleep quality from artificial light sources like ceiling lights and electronic devices. Human’s natural circadian rhythms follow a light-darkness diurnal pattern that are disrupted due to the modern abundance of artificial lighting, which have been found to increase the likelihood of developing sleep disorders [1]. Other studies have found that visible light exposure prior to bedtime can suppress the onset of melatonin production, which can impact sleep quality [3]. Previous studies on this subject have predominantly focused on the effect of blue light from electronic devices. [4] examined the effect of electronic device usage within two hours before bedtime in university students in an observational study. Students were recruited and surveyed on their electronic device usage, sleep quality, depression, lifestyle habits, and demographic characteristics. Similarly, [5] also examined various observational studies on the effect of mobile device usage on both sleep quality and academic performance in high school students. We seek to study if limiting all visible light with the simple use of sunglasses can improve sleep quality.
+
+Our research question is thus posed: **does reducing exposure to visible light by wearing sunglasses one hour before bedtime have an impact on sleep quality?**  
+
+There are several hypotheses that our research question will test:
+\begin{enumerate}
+  \item $H_0$: There is no impact on sleep quality by wearing sunglasses before bedtime.  
+  \item $H_1$: There is an impact on sleep quality by wearing sunglasses before bedtime.
+  \begin{enumerate}
+    \item The impact is positive on sleep quality.  
+    \item The impact is negative on sleep quality.
+  \end{enumerate}
+\end{enumerate}
+
+We theorize sunglasses limit exposure to visible light, and when worn in the runup to bedtime, mimic a more natural onset of darkness, potentially triggering the biological processes that prepare the brain for sleep. We expect that reducing light exposure before bedtime by wearing sunglasses will have an effect on sleep quality and that effect should be positive.
+
+
+\section{Experimental Details}
+We recruited subjects to participate in a two-week paired test, during which they tracked their sleep using smart watches for a control phase and a treatment phase. During the control phase, participants went about their normal bedtime routines with the exception of wearing their smartwatch to sleep. During the treatment phase, participants put on a pair of sunglasses one hour before their typical bedtime, went about their normal bedtime routine, and wore their smartwatch to sleep. Each phase was 4 days long, Monday through Thursday with a 3 day break in between each phase. This was to mitigate potential variance from irregular sleep habits on weekends and carryover effects from the different phases. At the end of each phase, participants were asked to report:
+\begin{enumerate}
+  \item their sleep scores for the 4 nights
+  \item treatment compliance (if during treatment phase)
+  \item subjective rating of their quality of sleep
+  \item subjective rating of how easily they fell asleep
+\end{enumerate}
+
+Eligible participants had to possess both sunglasses and a smartwatch that was capable of calculating sleep score\footnote{See Appendix A for full list of eligible smartwatch models}, which is how we operationalize sleep quality. Sleep score is a value calculated from total sleep time, time spent in specific stages of sleep (REM, deep sleep, and light/core sleep), number of night wakings, breathing, heart rate, and movements during the night. Our paired study compared average sleep scores of control vs. treatment phases.  
+
+Each eligible participant was randomly assigned to either complete the control or treatment phase first based on their order of enrollment. This was to account for any potential order effects. For example, the first participant enrolled was assigned “treatment-control” (i.e., treatment phase for week 1, then control phase for week 2). The second enrolled participant was assigned “control-treatment”, the third “treatment-control”, etc. Randomization was confirmed with the sharp null hypothesis test.  
+
+To discourage attrition, participants were incentivized with a $20 Amazon gift card upon return of a complete set of data (sleep scores for both control and treatment phases). To encourage compliance, participants could opt in to receive email reminders to wear their smartwatches and during treatment, sunglasses, an hour before their self-reported bedtime.
+
+From our pre-experiment power calculation based on a small scale pilot study, we estimated a mean control sleep score of 75 with an effect size of 4 and a standard deviation of 5. With a sample size of 30, we would be able to achieve a power of 81.6% with our experiment. Ultimately, twenty-two participants returned complete sets of data, so our experiment has lower power than anticipated, assuming our assumptions about effect size and standard deviation hold.
+
+
+\section{Analysis}
+
+
+```{r regression table, include=TRUE, results='asis', warning = FALSE, echo = FALSE}
+stargazer(model_base, 
+          model_prevsleep, 
+          model_complete,
+          model_complete,
+          type = 'latex',
+          title='Regression Results of Mean Sleep Score',
+          dep.var.labels = 'Mean Sleep Score',
+          order="Constant",
+          covariate.labels = c("(Intercept)",
+                               "Sunglasses Treatment",
+                               "Sleep Quality",
+                               "Trouble Sleeping",
+                               "Typical Total Sleep",
+                               "Age Group",
+                               "Gender"
+                               ),
+          se = list(robust_base, 
+                    robust_prevsleep, 
+                    robust_complete, 
+                    cluster_se),
+          # column.sep.width = "-10pt",
+          # single.row = TRUE,
+          column.labels = c("Base Model", 
+                            "Previous Sleep Info",
+                            "Demographic Info",
+                            "Cluster by Watch Brand"),
+          notes = "HC robust standard errors in parantheses.",
+          font.size = "small",
+          no.space = TRUE,
+          header = FALSE
+          )
+```
+
+
+\section{Conclusion}
+
+\section{Appendix A}
+\begin{enumerate}
+  \item Garmin - certain models, check \href{https://support.garmin.com/en-US/?faq=DWcdBazhr097VgqFufsTk8}{here} for sleep score compatibility
+  \item Apple watch - all models
+  \item Fitbit - all models newer than Inspire 2
+  \item Google Pixel watch - All models
+  \item Samsung Galaxy watch - Galaxy Fit2, Galaxy Watch Active2, Galaxy Watch3, and all newer models
+  \item Oura - all models
+
+\end{enumerate}
+
+\section{References}
+1. Blume, C., Garbazza, C., & Spitschan, M. (2019). Effects of light on human circadian rhythms, sleep and mood. Somnologie, 23(3), 147.
+2. Diekelmann S. Sleep for cognitive enhancement. Front Syst Neurosci. 2014 Apr 2;8:46. doi: 10.3389/fnsys.2014.00046. PMID: 24765066; PMCID: PMC3980112.
+3. Gooley JJ, Chamberlain K, Smith KA, Khalsa SB, Rajaratnam SM, Van Reen E, Zeitzer JM, Czeisler CA, Lockley SW. Exposure to room light before bedtime suppresses melatonin onset and shortens melatonin duration in humans. J Clin Endocrinol Metab. 2011 Mar;96(3):E463-72. doi: 10.1210/jc.2010-2098. Epub 2010 Dec 30. PMID: 21193540; PMCID: PMC3047226.
+4. Pham, H. T., Chuang, H. L., Kuo, C. P., Yeh, T. P., & Liao, W. C. (2021, August). Electronic device use before bedtime and sleep quality among university students. In Healthcare (Vol. 9, No. 9, p. 1091). MDPI.
+5. Owusu-Marfo, J., Lulin, Z., Antwi, H. A., Kissi, J., Antwi, M. O., & Asare, I. (2018). The Effect of Smart mobile devices usage on Sleep Quality and academic performance–A Narrative Review. Canadian Journal of Applied Science and Technology, 6(2).

@@ -46,13 +46,6 @@ We simulate the experiment in different scenarios of true average treatment effe
 
 # Sleep Score Scenarios
 
-Assumptions:
-
--   The mean non-intervention sleep score is 75 (for scenarios 1-4). The standard deviation of sleep scores per individual is \~7.
-    -   These figures are determined by a gathering of 2-3 week sleep scores from friends of the researchers.
-    -   This average is also supported by data provided by Garmin (\textit{Garmin Blog}).
--   Sleep scores are roughly normally distributed in the population. It is bound by [0-100].
-
 ```{r include=FALSE}
 #significance level
 alpha = 0.05
@@ -63,6 +56,13 @@ control_avg_score = 75
 # vector of sample sizes
 sample_sizes = seq(10, 100, by = 10)
 ```
+
+Assumptions:
+
+-   The mean non-intervention sleep score is 75 (for scenarios 1-4). The standard deviation of sleep scores per individual is \~7.
+    -   These figures are determined by a gathering of 2-3 week sleep scores from friends of the researchers.
+    -   This average is also supported by data provided by Garmin (\textit{Garmin Blog}).
+-   Sleep scores are roughly normally distributed in the population. It is bound by [0-100].
 
 ## Scenario 1 (Base Case) - Measurement: Sleep Score, ATE: 8, SD: 7
 
@@ -402,7 +402,7 @@ true_ate_deep = 5
 true_ate_rem = 7
 ```
 
-In order to achieve power of around 60%-80% wot 20 to 30 people we would need the true ATE for each one of these to be:
+In order to achieve power of around 60%-80% with 20 to 30 people we would need the true ATE for each one of these to be:
 
 -   $ATE_{deep}$ = `r round(true_ate_deep, 2)`%.
 -   $ATE_{REM}$ = `r round(true_ate_rem, 2)`%..
@@ -483,6 +483,8 @@ ate_rem_o <- data.table(sample_sizes, sample_powers)
 ate_rem_o
 ```
 
+We reach a power of .8 around 26-27 subjects.
+
 # Plot of Achieved Power
 
 Comparing the powers of each scenario, we plot:
@@ -502,8 +504,6 @@ ggplot(combined_data, aes(x = sample_sizes, y = sample_powers, group = dataset, 
   labs(x = "Sample Size", y = "Power", title = "Power Analysis", color = "Scenario") +
   theme(legend.title = element_text(face="bold"))
 ```
-
-We reach a power of .8 around 26-27 subjects.
 
 ```{=tex}
 \section{References}

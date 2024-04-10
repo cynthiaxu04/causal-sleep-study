@@ -1,0 +1,156 @@
+------------------------------------------------------------------------
+
+output: pdf_document:
+
+```{r import libraries}
+library(data.table)
+library(sandwich)
+library(lmtest)
+library(ggplot2)
+library(knitr)
+library(stargazer)
+library(dplyr)
+```
+
+```{r with unpaired data}
+data <- fread("../data/cleaned_data.csv")
+
+data[, avg_ss := rowMeans(.SD, na.rm = TRUE), .SDcols = c("day1_ss", "day2_ss", "day3_ss", "day4_ss")]
+```
+
+```{r simple model}
+model <- lm(avg_ss ~ treat, data = data)
+
+summary(model)
+
+robust_se <- sqrt(diag(vcovHC(model, type="HC1")))
+
+#print coefficients and robust standard errors
+coefficients_summary <- summary(model)$coefficients[, 1:2]
+coefficients_summary[, 2] <- robust_se
+colnames(coefficients_summary) <- c("Estimate", "Robust SE")
+print(coefficients_summary)
+
+#CIs
+model_ci <- confint(model)
+print(model_ci)
+
+```
+
+```{r model with phase variables}
+model2 <- lm(avg_ss ~ treat + phase_sq + phase_ts, data = data)
+
+summary(model2)
+
+robust_se2 <- sqrt(diag(vcovHC(model2, type="HC1")))
+
+#print coefficients and robust standard errors
+coefficients_summary2 <- summary(model2)$coefficients[, 1:2]
+coefficients_summary2[, 2] <- robust_se2
+colnames(coefficients_summary2) <- c("Estimate", "Robust SE")
+print(coefficients_summary2)
+
+#CIs
+model2_ci <- confint(model2)
+print(model2_ci)
+```
+
+```{r model with overall/historical variables}
+model3 <- lm(avg_ss ~ treat + sleep_quality + trouble_sleep + total_sleep + age_group + gender, data = data)
+
+summary(model3)
+
+robust_se3 <- sqrt(diag(vcovHC(model3, type="HC1")))
+
+#print coefficients and robust standard errors
+coefficients_summary3 <- summary(model3)$coefficients[, 1:2]
+coefficients_summary3[, 2] <- robust_se3
+colnames(coefficients_summary3) <- c("Estimate", "Robust SE")
+print(coefficients_summary3)
+
+#CIs
+model3_ci <- confint(model3)
+print(model3_ci)
+
+```
+
+```{r model by smartwatch}
+#make watch a factor
+data$watch <- factor(data$watch) #Apple watch is reference level, coefficients are relative to Apple watch
+
+model4 <- lm(avg_ss ~ treat + watch, data = data)
+
+summary(model4)
+
+robust_se4 <- sqrt(diag(vcovHC(model4, type="HC1")))
+
+#print coefficients and robust standard errors
+coefficients_summary4 <- summary(model4)$coefficients[, 1:2]
+coefficients_summary4[, 2] <- robust_se4
+colnames(coefficients_summary4) <- c("Estimate", "Robust SE")
+print(coefficients_summary4)
+
+#CIs
+model4_ci <- confint(model4)
+print(model4_ci)
+```
+
+```{r model with only significant coefficients}
+model5 <- lm(avg_ss ~ treat + phase_sq + phase_ts + sleep_quality + trouble_sleep + total_sleep + age_group + gender, data = data)
+
+summary(model5)
+
+robust_se5 <- sqrt(diag(vcovHC(model5, type="HC1")))
+
+#print coefficients and robust standard errors
+coefficients_summary5 <- summary(model5)$coefficients[, 1:2]
+coefficients_summary5[, 2] <- robust_se5
+colnames(coefficients_summary5) <- c("Estimate", "Robust SE")
+print(coefficients_summary5)
+
+#CIs
+model5_ci <- confint(model5)
+print(model5_ci)
+
+```
+
+```{r regression table, echo=TRUE, results="asis"}
+stargazer(model, model2, model5, type = 'latex',
+          title='Regression Results of Mean Sleep Score',
+          dep.var.labels = 'Mean Sleep Score',
+          covariate.labels = c("Sunglasses Treatment",
+                               "Sleep Quality during Experiment Phase",
+                               "Trouble Sleeping during Experiment Phase",
+                               "Sleep Quality before Experiment",
+                               "Trouble Sleeping before Experiment",
+                               "Typical Total Sleep before Experiment",
+                               "Age Group",
+                               "Gender"),
+          se = list(robust_se, robust_se2, robust_se5),
+          column.sep.width = "-10pt",
+          # single.row = TRUE,
+          notes = "HC robust standard errors in parantheses.",
+          font.size = "small",
+          header = FALSE,
+          no.space = TRUE)
+```
+
+```{r}
+robust_se
+```
+
+```{r}
+model5$coefficients
+```
+
+```{r paired t-test}
+paired_data <- fread("../data/paired_cleaned_data.csv")
+
+#calculate average sleep scores
+paired_data[, avg_ss_ctrl := rowMeans(.SD, na.rm = TRUE), .SDcols = c("day1_ss_ctrl", "day2_ss_ctrl", "day3_ss_ctrl", "day4_ss_ctrl")]
+paired_data[, avg_ss_treat := rowMeans(.SD, na.rm = TRUE), .SDcols = c("day1_ss_treat", "day2_ss_treat", "day3_ss_treat", "day4_ss_treat")]
+
+paired_t <- t.test(paired_data$avg_ss_ctrl, paired_data$avg_ss_treat, paired=TRUE)
+
+print(paired_t)
+```

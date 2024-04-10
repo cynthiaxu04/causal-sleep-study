@@ -27,18 +27,23 @@ library(stargazer)
 
 ```{r models, include=FALSE}
 data <- fread("../data/cleaned_data.csv")
-
 data[, avg_ss := rowMeans(.SD, na.rm = TRUE), .SDcols = c("day1_ss", "day2_ss", "day3_ss", "day4_ss")]
 
-model <- lm(avg_ss ~ treat, data = data)
-robust_se <- sqrt(diag(vcovHC(model, type="HC1")))
 
-model2 <- lm(avg_ss ~ treat + phase_sq + phase_ts, data = data)
-robust_se2 <- sqrt(diag(vcovHC(model2, type="HC1")))
+model_base <- lm(avg_ss ~ treat, data = data)
+robust_base <- sqrt(diag(vcovHC(model_base, type="HC1")))
 
-model5 <- lm(avg_ss ~ treat + phase_sq + phase_ts + sleep_quality + trouble_sleep + total_sleep + age_group + gender, data = data)
-robust_se5 <- sqrt(diag(vcovHC(model5, type="HC1")))
+model_prevsleep <- lm(avg_ss ~ treat + sleep_quality + 
+                        trouble_sleep + total_sleep, 
+                      data = data)
+robust_prevsleep <- sqrt(diag(vcovHC(model_prevsleep, type="HC1")))
 
+model_complete <- lm(
+  avg_ss ~ treat + sleep_quality + trouble_sleep + 
+    total_sleep + age_group + gender, 
+  data = data)
+robust_complete <- sqrt(diag(vcovHC(model_complete, type="HC1")))
+cluster_se <- sqrt(diag(vcovCL(model_complete, cluster = data[ , watch])))
 ```
 
 
@@ -83,25 +88,39 @@ From our pre-experiment power calculation based on a small scale pilot study, we
 
 \section{Analysis}
 
-```{r regression table, echo=FALSE, results="asis"}
-stargazer(model, model2, model5, type = 'latex',
+
+```{r regression table, include=TRUE, results='asis', warning = FALSE, echo = FALSE}
+stargazer(model_base, 
+          model_prevsleep, 
+          model_complete,
+          model_complete,
+          type = 'latex',
           title='Regression Results of Mean Sleep Score',
           dep.var.labels = 'Mean Sleep Score',
-          covariate.labels = c("Sunglasses Treatment",
-                               "Sleep Quality during Experiment Phase",
-                               "Trouble Sleeping during Experiment Phase",
-                               "Sleep Quality before Experiment",
-                               "Trouble Sleeping before Experiment",
-                               "Typical Total Sleep before Experiment",
+          order="Constant",
+          covariate.labels = c("(Intercept)",
+                               "Sunglasses Treatment",
+                               "Sleep Quality",
+                               "Trouble Sleeping",
+                               "Typical Total Sleep",
                                "Age Group",
-                               "Gender"),
-          se = list(robust_se, robust_se2, robust_se5),
-          column.sep.width = "-10pt",
+                               "Gender"
+                               ),
+          se = list(robust_base, 
+                    robust_prevsleep, 
+                    robust_complete, 
+                    cluster_se),
+          # column.sep.width = "-10pt",
           # single.row = TRUE,
+          column.labels = c("Base Model", 
+                            "Previous Sleep Info",
+                            "Demographic Info",
+                            "Cluster by Watch Brand"),
           notes = "HC robust standard errors in parantheses.",
           font.size = "small",
-          header = FALSE,
-          no.space = TRUE)
+          no.space = TRUE,
+          header = FALSE
+          )
 ```
 
 

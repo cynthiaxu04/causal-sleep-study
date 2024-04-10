@@ -1,0 +1,184 @@
+```{r import libraries}
+library(data.table)
+library(sandwich)
+library(lmtest)
+library(ggplot2)
+library(knitr)
+library(stargazer)
+```
+```{r with unpaired data}
+data_2 <- fread("../data/cleaned_data.csv")
+
+data_2[, avg_ss := rowMeans(.SD, na.rm = TRUE), .SDcols = c("day1_ss", "day2_ss", "day3_ss", "day4_ss")]
+
+model <- lm(avg_ss ~ treat, data = data_2)
+summary(model)
+```
+
+```{r}
+head(data_2)
+```
+
+```{r}
+model_2 <- lm(avg_ss ~ treat + gender, data = data_2)
+summary(model_2)
+```
+```{r}
+coefs_cluster <- coeftest(
+  model_2, 
+  vcov = vcovCL(
+    model_2, 
+    cluster = data_2[ , watch]
+    )
+  )
+
+coefs_cluster
+```
+
+```{r}
+model_3 <- lm(avg_ss ~ treat + gender + age_group + sleep_quality, data = data_2)
+summary(model_3)
+```
+```{r}
+coefs_cluster_3 <- coeftest(
+  model_3, 
+  vcov = vcovCL(
+    model_3, 
+    cluster = data_2[ , watch]
+    )
+  )
+
+coefs_cluster_3
+```
+
+```{r}
+model_sq <- lm(phase_sq ~ treat + gender + age_group + sleep_quality, data = data_2)
+summary(model_sq)
+```
+```{r}
+coefs_cluster_sq <- coeftest(
+  model_sq, 
+  vcov = vcovCL(
+    model_sq, 
+    cluster = data_2[ , watch]
+    )
+  )
+
+coefs_cluster_sq
+```
+
+
+```{r load data}
+data <- fread("../data/paired_cleaned_data.csv")
+
+#calculate average sleep scores
+data[, avg_ss_ctrl := rowMeans(.SD, na.rm = TRUE), .SDcols = c("day1_ss_ctrl", "day2_ss_ctrl", "day3_ss_ctrl", "day4_ss_ctrl")]
+data[, avg_ss_treat := rowMeans(.SD, na.rm = TRUE), .SDcols = c("day1_ss_treat", "day2_ss_treat", "day3_ss_treat", "day4_ss_treat")]
+```
+
+```{r distribution of data}
+cols_to_plot <- c("avg_ss_ctrl", "avg_ss_treat", "phase_sq_ctrl", 
+                  "phase_sq_treat", "phase_ts_ctrl", "phase_ts_treat", 
+                  "sleep_quality", "trouble_sleep", "total_sleep")
+
+for (col in cols_to_plot) {
+  hist(data[[col]], main=paste("Histogram of", col), xlab="Values", ylab="Frequency")
+}
+
+```
+```{r}
+hist_ctrl <-  ggplot() + 
+  geom_histogram(
+    aes(data$avg_ss_ctrl),
+    fill = "#0099F8",
+    color="black",
+    bins = 8,
+    alpha = 0.6) +
+  labs(
+    title = "Average Sleep Score",
+    subtitle = "Control Phase",
+    x = "Sleep Score",
+    y = "Frequency"
+  ) +
+  theme_classic() +
+  theme(
+    plot.title = element_text(color = "#0099F8",
+                              size = 17,
+                              face = "bold"),
+    plot.subtitle = element_text(color="#969696",
+                                   size = 12, 
+                                   face = "italic"),
+    axis.title = element_text(color = "#969696",
+                              size = 10,
+                              face = "bold"),
+    axis.text = element_text(color = "#969696", size = 10),
+    axis.line = element_line(color = "#969696")
+  )
+
+hist_treat <-  ggplot() + 
+  geom_histogram(
+    aes(data$avg_ss_treat),
+    fill = "#0099F8",
+    color="black",
+    bins = 8,
+    alpha = 0.6) +
+  labs(
+    title = "Average Sleep Score",
+    subtitle = "Treatment Phase",
+    x = "Sleep Score",
+    y = "Frequency"
+  ) +
+  theme_classic() +
+  theme(
+    plot.title = element_text(color = "#0099F8",
+                              size = 17,
+                              face = "bold"),
+    plot.subtitle = element_text(color="#969696",
+                                   size = 12, 
+                                   face = "italic"),
+    axis.title = element_text(color = "#969696",
+                              size = 10,
+                              face = "bold"),
+    axis.text = element_text(color = "#969696", size = 10),
+    axis.line = element_line(color = "#969696")
+  )
+
+
+hist_ctrl
+hist_treat
+```
+
+```{r observations}
+# Observations on data:
+# Sleep scores are left-skewed (both from control and treatment phase)
+```
+
+```{r simple model}
+simple_model <- lm(avg_ss_treat ~ avg_ss_ctrl, data=data)
+
+summary(simple_model)
+```
+```{r model with total sleep, overall trouble sleeping, and overall sleep quality}
+overall_model <- lm(avg_ss_treat ~ avg_ss_ctrl + sleep_quality + trouble_sleep + total_sleep, data=data)
+
+summary(overall_model)
+```
+
+```{r model with phase Likert covariates}
+phase_model <- lm(avg_ss_treat ~ avg_ss_ctrl + phase_sq_ctrl + phase_sq_treat + phase_ts_ctrl + phase_ts_treat, data=data)
+
+summary(phase_model)
+```
+
+```{r paired t-test}
+paired_t <- t.test(data$avg_ss_ctrl, data$avg_ss_treat, paired=TRUE)
+
+?t.test
+print(paired_t)
+```
+```{r}
+library(Hmisc)
+t.test(data$avg_ss_ctrl, data$avg_ss_treat, paired=TRUE, cluster = data$watch)
+```
+
+

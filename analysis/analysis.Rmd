@@ -38,7 +38,7 @@ print(model_ci)
 ```
 
 ```{r model with phase variables}
-model2 <- lm(avg_ss ~ treat + phase_sq + phase_ts, data = data)
+model2 <- lm(phase_sq ~ treat, data = data)
 
 summary(model2)
 

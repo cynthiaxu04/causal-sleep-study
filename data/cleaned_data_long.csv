@@ -1,0 +1,177 @@
+timezone,sleep_quality,trouble_sleep,gender,age_group,total_sleep,watch,watch_model,Assignment,phase_sq,phase_ts,treat,Timestamp,participant_id,week,day,sleep_score
+UTC-08:00 (PT) Pacific Time zone,2.0,4.0,1.0,3.0,8.0,Apple watch,Watch Ultra,treat-ctrl,3.0,2.0,0,2024-03-08 13:10:43,0,2,1,69
+UTC-08:00 (PT) Pacific Time zone,2.0,4.0,1.0,3.0,8.0,Apple watch,Watch Ultra,treat-ctrl,3.0,2.0,1,2024-03-02 13:33:44,0,1,1,70
+UTC-08:00 (PT) Pacific Time zone,3.0,4.0,0.0,2.0,7.0,Fitbit watch,Fitbit Charge 5,ctrl-treat,3.0,3.0,0,2024-03-01 12:08:34,1,1,1,70
+UTC-08:00 (PT) Pacific Time zone,3.0,4.0,0.0,2.0,7.0,Fitbit watch,Fitbit Charge 5,ctrl-treat,3.0,3.0,1,2024-03-08 08:10:32,1,2,1,83
+UTC-08:00 (PT) Pacific Time zone,2.0,4.0,0.0,2.0,8.0,Apple watch,Apple Watch series 7,treat-ctrl,3.0,3.0,0,2024-03-08 08:37:28,2,2,1,57
+UTC-08:00 (PT) Pacific Time zone,2.0,4.0,0.0,2.0,8.0,Apple watch,Apple Watch series 7,treat-ctrl,2.0,4.0,1,2024-03-01 09:39:48,2,1,1,34
+UTC-08:00 (PT) Pacific Time zone,3.0,3.0,0.0,2.0,8.0,Samsung Galaxy watch,Samsung Galaxy 5,ctrl-treat,3.0,2.0,0,2024-03-01 08:23:52,3,1,1,70
+UTC-08:00 (PT) Pacific Time zone,3.0,3.0,0.0,2.0,8.0,Samsung Galaxy watch,Samsung Galaxy 5,ctrl-treat,3.0,3.0,1,2024-03-08 18:45:57,3,2,1,80
+UTC-08:00 (PT) Pacific Time zone,4.0,4.0,0.0,3.0,8.0,Apple watch,Series 9,treat-ctrl,4.0,3.0,0,2024-03-09 09:57:31,4,2,1,91
+UTC-08:00 (PT) Pacific Time zone,4.0,4.0,0.0,3.0,8.0,Apple watch,Series 9,treat-ctrl,4.0,3.0,1,2024-03-01 08:56:46,4,1,1,88
+UTC-08:00 (PT) Pacific Time zone,4.0,3.0,1.0,2.0,8.0,Fitbit watch,Versa 3,ctrl-treat,3.0,2.0,0,2024-03-01 17:59:12,5,1,1,
+UTC-08:00 (PT) Pacific Time zone,4.0,3.0,1.0,2.0,8.0,Fitbit watch,Versa 3,ctrl-treat,2.0,3.0,1,2024-03-08 10:52:21,5,2,1,73
+UTC-05:00 (ET) Eastern Time zone,3.0,3.0,1.0,2.0,9.0,Fitbit watch,Charge 2,ctrl-treat,3.0,3.0,0,2024-03-10 15:33:35,6,1,1,78
+UTC-05:00 (ET) Eastern Time zone,3.0,3.0,1.0,2.0,9.0,Fitbit watch,Charge 2,ctrl-treat,3.0,3.0,1,2024-03-17 10:05:44,6,2,1,75
+UTC-08:00 (PT) Pacific Time zone,3.0,4.0,1.0,2.0,9.0,Garmin watch,Forerunner 945,treat-ctrl,3.0,3.0,0,2024-03-12 08:41:39,7,2,1,86
+UTC-08:00 (PT) Pacific Time zone,3.0,4.0,1.0,2.0,9.0,Garmin watch,Forerunner 945,treat-ctrl,3.0,3.0,1,2024-03-05 13:48:39,7,1,1,90
+UTC-06:00 (CT) Central Time zone,3.0,2.0,1.0,6.0,9.0,Apple watch,Apple Watch SE,ctrl-treat,3.0,1.0,0,2024-03-09 14:31:58,8,1,1,58
+UTC-06:00 (CT) Central Time zone,3.0,2.0,1.0,6.0,9.0,Apple watch,Apple Watch SE,ctrl-treat,2.0,3.0,1,2024-03-17 17:49:36,8,2,1,56
+UTC-08:00 (PT) Pacific Time zone,3.0,1.0,0.0,2.0,7.0,Garmin watch,Forerunner 255,ctrl-treat,4.0,1.0,0,2024-03-08 08:17:12,9,1,1,84
+UTC-08:00 (PT) Pacific Time zone,3.0,1.0,0.0,2.0,7.0,Garmin watch,Forerunner 255,ctrl-treat,4.0,1.0,1,2024-03-20 08:18:24,9,2,1,91
+UTC-08:00 (PT) Pacific Time zone,4.0,4.0,0.0,2.0,9.0,Apple watch,Ultra,ctrl-treat,4.0,3.0,0,2024-03-08 09:56:34,10,1,1,86
+UTC-08:00 (PT) Pacific Time zone,4.0,4.0,0.0,2.0,9.0,Apple watch,Ultra,ctrl-treat,5.0,1.0,1,2024-03-15 16:20:25,10,2,1,91
+UTC-08:00 (PT) Pacific Time zone,4.0,3.0,0.0,2.0,8.0,Garmin watch,Forerunner 945 LTE,treat-ctrl,4.0,2.0,0,2024-03-15 09:55:33,11,2,1,82
+UTC-08:00 (PT) Pacific Time zone,4.0,3.0,0.0,2.0,8.0,Garmin watch,Forerunner 945 LTE,treat-ctrl,3.0,2.0,1,2024-03-10 07:25:00,11,1,1,81
+UTC-08:00 (PT) Pacific Time zone,4.0,4.0,0.0,4.0,8.0,Apple watch,Apple Watch Series 9,ctrl-treat,2.0,4.0,0,2024-03-28 09:11:06,12,1,1,70
+UTC-08:00 (PT) Pacific Time zone,4.0,4.0,0.0,4.0,8.0,Apple watch,Apple Watch Series 9,ctrl-treat,3.0,3.0,1,2024-03-28 09:12:09,12,2,1,68
+UTC-06:00 (CT) Central Time zone,3.0,4.0,0.0,3.0,19.0,Samsung Galaxy watch,,treat-ctrl,3.0,4.0,0,2024-03-24 22:03:24,13,2,1,86
+UTC-06:00 (CT) Central Time zone,3.0,4.0,0.0,3.0,19.0,Samsung Galaxy watch,,treat-ctrl,3.0,4.0,1,2024-03-18 21:44:07,13,1,1,74
+UTC-06:00 (CT) Central Time zone,2.0,4.0,0.0,2.0,5.0,Samsung Galaxy watch,Galaxy Watch 4,treat-ctrl,1.0,4.0,0,2024-03-23 22:33:23,14,2,1,67
+UTC-06:00 (CT) Central Time zone,2.0,4.0,0.0,2.0,5.0,Samsung Galaxy watch,Galaxy Watch 4,treat-ctrl,3.0,2.0,1,2024-03-17 06:12:07,14,1,1,57
+UTC-06:00 (CT) Central Time zone,4.0,2.0,0.0,3.0,7.0,Apple watch,Apple Watch Series 6. Model A2292,ctrl-treat,3.0,2.0,0,2024-03-17 18:32:11,15,1,1,94
+UTC-06:00 (CT) Central Time zone,4.0,2.0,0.0,3.0,7.0,Apple watch,Apple Watch Series 6. Model A2292,ctrl-treat,3.0,2.0,1,2024-03-22 11:29:05,15,2,1,94
+UTC-06:00 (CT) Central Time zone,4.0,2.0,0.0,3.0,8.0,Other device,SMART WATCH-400/SW,treat-ctrl,3.0,2.0,0,2024-03-24 11:33:10,16,2,1,97
+UTC-06:00 (CT) Central Time zone,4.0,2.0,0.0,3.0,8.0,Other device,SMART WATCH-400/SW,treat-ctrl,4.0,2.0,1,2024-03-17 18:59:43,16,1,1,51
+UTC-06:00 (CT) Central Time zone,4.0,3.0,1.0,2.0,8.0,Fitbit watch,none,ctrl-treat,4.0,2.0,0,2024-03-15 10:22:34,17,1,1,82
+UTC-06:00 (CT) Central Time zone,4.0,3.0,1.0,2.0,8.0,Fitbit watch,none,ctrl-treat,4.0,3.0,1,2024-03-29 06:15:40,17,2,1,79
+UTC-06:00 (CT) Central Time zone,3.0,4.0,1.0,2.0,7.0,Apple watch,None,treat-ctrl,3.0,3.0,0,2024-03-28 16:24:04,18,2,1,81
+UTC-06:00 (CT) Central Time zone,3.0,4.0,1.0,2.0,7.0,Apple watch,None,treat-ctrl,4.0,3.0,1,2024-03-19 13:37:53,18,1,1,73
+UTC-06:00 (CT) Central Time zone,4.0,2.0,1.0,2.0,8.0,Apple watch,Ultra 2,ctrl-treat,3.0,2.0,0,2024-03-15 17:57:14,19,1,1,89
+UTC-06:00 (CT) Central Time zone,4.0,2.0,1.0,2.0,8.0,Apple watch,Ultra 2,ctrl-treat,4.0,1.0,1,2024-03-24 21:33:26,19,2,1,96
+UTC-06:00 (CT) Central Time zone,4.0,2.0,1.0,4.0,7.0,Garmin watch,Garmin Fenix 6s,treat-ctrl,5.0,2.0,0,2024-04-02 15:38:12,20,2,1,81
+UTC-06:00 (CT) Central Time zone,4.0,2.0,1.0,4.0,7.0,Garmin watch,Garmin Fenix 6s,treat-ctrl,4.0,3.0,1,2024-03-24 19:09:56,20,1,1,
+UTC-06:00 (CT) Central Time zone,3.0,3.0,1.0,5.0,8.0,Apple watch,SE GPS 2a gen,ctrl-treat,3.0,3.0,0,2024-03-23 10:20:10,21,1,1,94
+UTC-06:00 (CT) Central Time zone,3.0,3.0,1.0,5.0,8.0,Apple watch,SE GPS 2a gen,ctrl-treat,2.0,3.0,1,2024-03-30 10:49:02,21,2,1,75
+UTC-08:00 (PT) Pacific Time zone,2.0,4.0,1.0,3.0,8.0,Apple watch,Watch Ultra,treat-ctrl,3.0,2.0,0,2024-03-08 13:10:43,0,2,2,77
+UTC-08:00 (PT) Pacific Time zone,2.0,4.0,1.0,3.0,8.0,Apple watch,Watch Ultra,treat-ctrl,3.0,2.0,1,2024-03-02 13:33:44,0,1,2,73
+UTC-08:00 (PT) Pacific Time zone,3.0,4.0,0.0,2.0,7.0,Fitbit watch,Fitbit Charge 5,ctrl-treat,3.0,3.0,0,2024-03-01 12:08:34,1,1,2,70
+UTC-08:00 (PT) Pacific Time zone,3.0,4.0,0.0,2.0,7.0,Fitbit watch,Fitbit Charge 5,ctrl-treat,3.0,3.0,1,2024-03-08 08:10:32,1,2,2,79
+UTC-08:00 (PT) Pacific Time zone,2.0,4.0,0.0,2.0,8.0,Apple watch,Apple Watch series 7,treat-ctrl,3.0,3.0,0,2024-03-08 08:37:28,2,2,2,63
+UTC-08:00 (PT) Pacific Time zone,2.0,4.0,0.0,2.0,8.0,Apple watch,Apple Watch series 7,treat-ctrl,2.0,4.0,1,2024-03-01 09:39:48,2,1,2,43
+UTC-08:00 (PT) Pacific Time zone,3.0,3.0,0.0,2.0,8.0,Samsung Galaxy watch,Samsung Galaxy 5,ctrl-treat,3.0,2.0,0,2024-03-01 08:23:52,3,1,2,80
+UTC-08:00 (PT) Pacific Time zone,3.0,3.0,0.0,2.0,8.0,Samsung Galaxy watch,Samsung Galaxy 5,ctrl-treat,3.0,3.0,1,2024-03-08 18:45:57,3,2,2,78
+UTC-08:00 (PT) Pacific Time zone,4.0,4.0,0.0,3.0,8.0,Apple watch,Series 9,treat-ctrl,4.0,3.0,0,2024-03-09 09:57:31,4,2,2,89
+UTC-08:00 (PT) Pacific Time zone,4.0,4.0,0.0,3.0,8.0,Apple watch,Series 9,treat-ctrl,4.0,3.0,1,2024-03-01 08:56:46,4,1,2,93
+UTC-08:00 (PT) Pacific Time zone,4.0,3.0,1.0,2.0,8.0,Fitbit watch,Versa 3,ctrl-treat,3.0,2.0,0,2024-03-01 17:59:12,5,1,2,85
+UTC-08:00 (PT) Pacific Time zone,4.0,3.0,1.0,2.0,8.0,Fitbit watch,Versa 3,ctrl-treat,2.0,3.0,1,2024-03-08 10:52:21,5,2,2,77
+UTC-05:00 (ET) Eastern Time zone,3.0,3.0,1.0,2.0,9.0,Fitbit watch,Charge 2,ctrl-treat,3.0,3.0,0,2024-03-10 15:33:35,6,1,2,79
+UTC-05:00 (ET) Eastern Time zone,3.0,3.0,1.0,2.0,9.0,Fitbit watch,Charge 2,ctrl-treat,3.0,3.0,1,2024-03-17 10:05:44,6,2,2,75
+UTC-08:00 (PT) Pacific Time zone,3.0,4.0,1.0,2.0,9.0,Garmin watch,Forerunner 945,treat-ctrl,3.0,3.0,0,2024-03-12 08:41:39,7,2,2,83
+UTC-08:00 (PT) Pacific Time zone,3.0,4.0,1.0,2.0,9.0,Garmin watch,Forerunner 945,treat-ctrl,3.0,3.0,1,2024-03-05 13:48:39,7,1,2,79
+UTC-06:00 (CT) Central Time zone,3.0,2.0,1.0,6.0,9.0,Apple watch,Apple Watch SE,ctrl-treat,3.0,1.0,0,2024-03-09 14:31:58,8,1,2,60
+UTC-06:00 (CT) Central Time zone,3.0,2.0,1.0,6.0,9.0,Apple watch,Apple Watch SE,ctrl-treat,2.0,3.0,1,2024-03-17 17:49:36,8,2,2,67
+UTC-08:00 (PT) Pacific Time zone,3.0,1.0,0.0,2.0,7.0,Garmin watch,Forerunner 255,ctrl-treat,4.0,1.0,0,2024-03-08 08:17:12,9,1,2,71
+UTC-08:00 (PT) Pacific Time zone,3.0,1.0,0.0,2.0,7.0,Garmin watch,Forerunner 255,ctrl-treat,4.0,1.0,1,2024-03-20 08:18:24,9,2,2,95
+UTC-08:00 (PT) Pacific Time zone,4.0,4.0,0.0,2.0,9.0,Apple watch,Ultra,ctrl-treat,4.0,3.0,0,2024-03-08 09:56:34,10,1,2,85
+UTC-08:00 (PT) Pacific Time zone,4.0,4.0,0.0,2.0,9.0,Apple watch,Ultra,ctrl-treat,5.0,1.0,1,2024-03-15 16:20:25,10,2,2,95
+UTC-08:00 (PT) Pacific Time zone,4.0,3.0,0.0,2.0,8.0,Garmin watch,Forerunner 945 LTE,treat-ctrl,4.0,2.0,0,2024-03-15 09:55:33,11,2,2,85
+UTC-08:00 (PT) Pacific Time zone,4.0,3.0,0.0,2.0,8.0,Garmin watch,Forerunner 945 LTE,treat-ctrl,3.0,2.0,1,2024-03-10 07:25:00,11,1,2,77
+UTC-08:00 (PT) Pacific Time zone,4.0,4.0,0.0,4.0,8.0,Apple watch,Apple Watch Series 9,ctrl-treat,2.0,4.0,0,2024-03-28 09:11:06,12,1,2,69
+UTC-08:00 (PT) Pacific Time zone,4.0,4.0,0.0,4.0,8.0,Apple watch,Apple Watch Series 9,ctrl-treat,3.0,3.0,1,2024-03-28 09:12:09,12,2,2,51
+UTC-06:00 (CT) Central Time zone,3.0,4.0,0.0,3.0,19.0,Samsung Galaxy watch,,treat-ctrl,3.0,4.0,0,2024-03-24 22:03:24,13,2,2,82
+UTC-06:00 (CT) Central Time zone,3.0,4.0,0.0,3.0,19.0,Samsung Galaxy watch,,treat-ctrl,3.0,4.0,1,2024-03-18 21:44:07,13,1,2,90
+UTC-06:00 (CT) Central Time zone,2.0,4.0,0.0,2.0,5.0,Samsung Galaxy watch,Galaxy Watch 4,treat-ctrl,1.0,4.0,0,2024-03-23 22:33:23,14,2,2,58
+UTC-06:00 (CT) Central Time zone,2.0,4.0,0.0,2.0,5.0,Samsung Galaxy watch,Galaxy Watch 4,treat-ctrl,3.0,2.0,1,2024-03-17 06:12:07,14,1,2,68
+UTC-06:00 (CT) Central Time zone,4.0,2.0,0.0,3.0,7.0,Apple watch,Apple Watch Series 6. Model A2292,ctrl-treat,3.0,2.0,0,2024-03-17 18:32:11,15,1,2,89
+UTC-06:00 (CT) Central Time zone,4.0,2.0,0.0,3.0,7.0,Apple watch,Apple Watch Series 6. Model A2292,ctrl-treat,3.0,2.0,1,2024-03-22 11:29:05,15,2,2,90
+UTC-06:00 (CT) Central Time zone,4.0,2.0,0.0,3.0,8.0,Other device,SMART WATCH-400/SW,treat-ctrl,3.0,2.0,0,2024-03-24 11:33:10,16,2,2,94
+UTC-06:00 (CT) Central Time zone,4.0,2.0,0.0,3.0,8.0,Other device,SMART WATCH-400/SW,treat-ctrl,4.0,2.0,1,2024-03-17 18:59:43,16,1,2,94
+UTC-06:00 (CT) Central Time zone,4.0,3.0,1.0,2.0,8.0,Fitbit watch,none,ctrl-treat,4.0,2.0,0,2024-03-15 10:22:34,17,1,2,86
+UTC-06:00 (CT) Central Time zone,4.0,3.0,1.0,2.0,8.0,Fitbit watch,none,ctrl-treat,4.0,3.0,1,2024-03-29 06:15:40,17,2,2,82
+UTC-06:00 (CT) Central Time zone,3.0,4.0,1.0,2.0,7.0,Apple watch,None,treat-ctrl,3.0,3.0,0,2024-03-28 16:24:04,18,2,2,86
+UTC-06:00 (CT) Central Time zone,3.0,4.0,1.0,2.0,7.0,Apple watch,None,treat-ctrl,4.0,3.0,1,2024-03-19 13:37:53,18,1,2,89
+UTC-06:00 (CT) Central Time zone,4.0,2.0,1.0,2.0,8.0,Apple watch,Ultra 2,ctrl-treat,3.0,2.0,0,2024-03-15 17:57:14,19,1,2,90
+UTC-06:00 (CT) Central Time zone,4.0,2.0,1.0,2.0,8.0,Apple watch,Ultra 2,ctrl-treat,4.0,1.0,1,2024-03-24 21:33:26,19,2,2,89
+UTC-06:00 (CT) Central Time zone,4.0,2.0,1.0,4.0,7.0,Garmin watch,Garmin Fenix 6s,treat-ctrl,5.0,2.0,0,2024-04-02 15:38:12,20,2,2,82
+UTC-06:00 (CT) Central Time zone,4.0,2.0,1.0,4.0,7.0,Garmin watch,Garmin Fenix 6s,treat-ctrl,4.0,3.0,1,2024-03-24 19:09:56,20,1,2,53
+UTC-06:00 (CT) Central Time zone,3.0,3.0,1.0,5.0,8.0,Apple watch,SE GPS 2a gen,ctrl-treat,3.0,3.0,0,2024-03-23 10:20:10,21,1,2,96
+UTC-06:00 (CT) Central Time zone,3.0,3.0,1.0,5.0,8.0,Apple watch,SE GPS 2a gen,ctrl-treat,2.0,3.0,1,2024-03-30 10:49:02,21,2,2,91
+UTC-08:00 (PT) Pacific Time zone,2.0,4.0,1.0,3.0,8.0,Apple watch,Watch Ultra,treat-ctrl,3.0,2.0,0,2024-03-08 13:10:43,0,2,3,79
+UTC-08:00 (PT) Pacific Time zone,2.0,4.0,1.0,3.0,8.0,Apple watch,Watch Ultra,treat-ctrl,3.0,2.0,1,2024-03-02 13:33:44,0,1,3,
+UTC-08:00 (PT) Pacific Time zone,3.0,4.0,0.0,2.0,7.0,Fitbit watch,Fitbit Charge 5,ctrl-treat,3.0,3.0,0,2024-03-01 12:08:34,1,1,3,74
+UTC-08:00 (PT) Pacific Time zone,3.0,4.0,0.0,2.0,7.0,Fitbit watch,Fitbit Charge 5,ctrl-treat,3.0,3.0,1,2024-03-08 08:10:32,1,2,3,72
+UTC-08:00 (PT) Pacific Time zone,2.0,4.0,0.0,2.0,8.0,Apple watch,Apple Watch series 7,treat-ctrl,3.0,3.0,0,2024-03-08 08:37:28,2,2,3,62
+UTC-08:00 (PT) Pacific Time zone,2.0,4.0,0.0,2.0,8.0,Apple watch,Apple Watch series 7,treat-ctrl,2.0,4.0,1,2024-03-01 09:39:48,2,1,3,63
+UTC-08:00 (PT) Pacific Time zone,3.0,3.0,0.0,2.0,8.0,Samsung Galaxy watch,Samsung Galaxy 5,ctrl-treat,3.0,2.0,0,2024-03-01 08:23:52,3,1,3,75
+UTC-08:00 (PT) Pacific Time zone,3.0,3.0,0.0,2.0,8.0,Samsung Galaxy watch,Samsung Galaxy 5,ctrl-treat,3.0,3.0,1,2024-03-08 18:45:57,3,2,3,69
+UTC-08:00 (PT) Pacific Time zone,4.0,4.0,0.0,3.0,8.0,Apple watch,Series 9,treat-ctrl,4.0,3.0,0,2024-03-09 09:57:31,4,2,3,85
+UTC-08:00 (PT) Pacific Time zone,4.0,4.0,0.0,3.0,8.0,Apple watch,Series 9,treat-ctrl,4.0,3.0,1,2024-03-01 08:56:46,4,1,3,86
+UTC-08:00 (PT) Pacific Time zone,4.0,3.0,1.0,2.0,8.0,Fitbit watch,Versa 3,ctrl-treat,3.0,2.0,0,2024-03-01 17:59:12,5,1,3,78
+UTC-08:00 (PT) Pacific Time zone,4.0,3.0,1.0,2.0,8.0,Fitbit watch,Versa 3,ctrl-treat,2.0,3.0,1,2024-03-08 10:52:21,5,2,3,74
+UTC-05:00 (ET) Eastern Time zone,3.0,3.0,1.0,2.0,9.0,Fitbit watch,Charge 2,ctrl-treat,3.0,3.0,0,2024-03-10 15:33:35,6,1,3,81
+UTC-05:00 (ET) Eastern Time zone,3.0,3.0,1.0,2.0,9.0,Fitbit watch,Charge 2,ctrl-treat,3.0,3.0,1,2024-03-17 10:05:44,6,2,3,74
+UTC-08:00 (PT) Pacific Time zone,3.0,4.0,1.0,2.0,9.0,Garmin watch,Forerunner 945,treat-ctrl,3.0,3.0,0,2024-03-12 08:41:39,7,2,3,80
+UTC-08:00 (PT) Pacific Time zone,3.0,4.0,1.0,2.0,9.0,Garmin watch,Forerunner 945,treat-ctrl,3.0,3.0,1,2024-03-05 13:48:39,7,1,3,62
+UTC-06:00 (CT) Central Time zone,3.0,2.0,1.0,6.0,9.0,Apple watch,Apple Watch SE,ctrl-treat,3.0,1.0,0,2024-03-09 14:31:58,8,1,3,67
+UTC-06:00 (CT) Central Time zone,3.0,2.0,1.0,6.0,9.0,Apple watch,Apple Watch SE,ctrl-treat,2.0,3.0,1,2024-03-17 17:49:36,8,2,3,44
+UTC-08:00 (PT) Pacific Time zone,3.0,1.0,0.0,2.0,7.0,Garmin watch,Forerunner 255,ctrl-treat,4.0,1.0,0,2024-03-08 08:17:12,9,1,3,89
+UTC-08:00 (PT) Pacific Time zone,3.0,1.0,0.0,2.0,7.0,Garmin watch,Forerunner 255,ctrl-treat,4.0,1.0,1,2024-03-20 08:18:24,9,2,3,83
+UTC-08:00 (PT) Pacific Time zone,4.0,4.0,0.0,2.0,9.0,Apple watch,Ultra,ctrl-treat,4.0,3.0,0,2024-03-08 09:56:34,10,1,3,92
+UTC-08:00 (PT) Pacific Time zone,4.0,4.0,0.0,2.0,9.0,Apple watch,Ultra,ctrl-treat,5.0,1.0,1,2024-03-15 16:20:25,10,2,3,94
+UTC-08:00 (PT) Pacific Time zone,4.0,3.0,0.0,2.0,8.0,Garmin watch,Forerunner 945 LTE,treat-ctrl,4.0,2.0,0,2024-03-15 09:55:33,11,2,3,84
+UTC-08:00 (PT) Pacific Time zone,4.0,3.0,0.0,2.0,8.0,Garmin watch,Forerunner 945 LTE,treat-ctrl,3.0,2.0,1,2024-03-10 07:25:00,11,1,3,87
+UTC-08:00 (PT) Pacific Time zone,4.0,4.0,0.0,4.0,8.0,Apple watch,Apple Watch Series 9,ctrl-treat,2.0,4.0,0,2024-03-28 09:11:06,12,1,3,49
+UTC-08:00 (PT) Pacific Time zone,4.0,4.0,0.0,4.0,8.0,Apple watch,Apple Watch Series 9,ctrl-treat,3.0,3.0,1,2024-03-28 09:12:09,12,2,3,75
+UTC-06:00 (CT) Central Time zone,3.0,4.0,0.0,3.0,19.0,Samsung Galaxy watch,,treat-ctrl,3.0,4.0,0,2024-03-24 22:03:24,13,2,3,68
+UTC-06:00 (CT) Central Time zone,3.0,4.0,0.0,3.0,19.0,Samsung Galaxy watch,,treat-ctrl,3.0,4.0,1,2024-03-18 21:44:07,13,1,3,80
+UTC-06:00 (CT) Central Time zone,2.0,4.0,0.0,2.0,5.0,Samsung Galaxy watch,Galaxy Watch 4,treat-ctrl,1.0,4.0,0,2024-03-23 22:33:23,14,2,3,49
+UTC-06:00 (CT) Central Time zone,2.0,4.0,0.0,2.0,5.0,Samsung Galaxy watch,Galaxy Watch 4,treat-ctrl,3.0,2.0,1,2024-03-17 06:12:07,14,1,3,63
+UTC-06:00 (CT) Central Time zone,4.0,2.0,0.0,3.0,7.0,Apple watch,Apple Watch Series 6. Model A2292,ctrl-treat,3.0,2.0,0,2024-03-17 18:32:11,15,1,3,94
+UTC-06:00 (CT) Central Time zone,4.0,2.0,0.0,3.0,7.0,Apple watch,Apple Watch Series 6. Model A2292,ctrl-treat,3.0,2.0,1,2024-03-22 11:29:05,15,2,3,69
+UTC-06:00 (CT) Central Time zone,4.0,2.0,0.0,3.0,8.0,Other device,SMART WATCH-400/SW,treat-ctrl,3.0,2.0,0,2024-03-24 11:33:10,16,2,3,97
+UTC-06:00 (CT) Central Time zone,4.0,2.0,0.0,3.0,8.0,Other device,SMART WATCH-400/SW,treat-ctrl,4.0,2.0,1,2024-03-17 18:59:43,16,1,3,91
+UTC-06:00 (CT) Central Time zone,4.0,3.0,1.0,2.0,8.0,Fitbit watch,none,ctrl-treat,4.0,2.0,0,2024-03-15 10:22:34,17,1,3,82
+UTC-06:00 (CT) Central Time zone,4.0,3.0,1.0,2.0,8.0,Fitbit watch,none,ctrl-treat,4.0,3.0,1,2024-03-29 06:15:40,17,2,3,77
+UTC-06:00 (CT) Central Time zone,3.0,4.0,1.0,2.0,7.0,Apple watch,None,treat-ctrl,3.0,3.0,0,2024-03-28 16:24:04,18,2,3,86
+UTC-06:00 (CT) Central Time zone,3.0,4.0,1.0,2.0,7.0,Apple watch,None,treat-ctrl,4.0,3.0,1,2024-03-19 13:37:53,18,1,3,84
+UTC-06:00 (CT) Central Time zone,4.0,2.0,1.0,2.0,8.0,Apple watch,Ultra 2,ctrl-treat,3.0,2.0,0,2024-03-15 17:57:14,19,1,3,94
+UTC-06:00 (CT) Central Time zone,4.0,2.0,1.0,2.0,8.0,Apple watch,Ultra 2,ctrl-treat,4.0,1.0,1,2024-03-24 21:33:26,19,2,3,94
+UTC-06:00 (CT) Central Time zone,4.0,2.0,1.0,4.0,7.0,Garmin watch,Garmin Fenix 6s,treat-ctrl,5.0,2.0,0,2024-04-02 15:38:12,20,2,3,40
+UTC-06:00 (CT) Central Time zone,4.0,2.0,1.0,4.0,7.0,Garmin watch,Garmin Fenix 6s,treat-ctrl,4.0,3.0,1,2024-03-24 19:09:56,20,1,3,78
+UTC-06:00 (CT) Central Time zone,3.0,3.0,1.0,5.0,8.0,Apple watch,SE GPS 2a gen,ctrl-treat,3.0,3.0,0,2024-03-23 10:20:10,21,1,3,86
+UTC-06:00 (CT) Central Time zone,3.0,3.0,1.0,5.0,8.0,Apple watch,SE GPS 2a gen,ctrl-treat,2.0,3.0,1,2024-03-30 10:49:02,21,2,3,93
+UTC-08:00 (PT) Pacific Time zone,2.0,4.0,1.0,3.0,8.0,Apple watch,Watch Ultra,treat-ctrl,3.0,2.0,0,2024-03-08 13:10:43,0,2,4,83
+UTC-08:00 (PT) Pacific Time zone,2.0,4.0,1.0,3.0,8.0,Apple watch,Watch Ultra,treat-ctrl,3.0,2.0,1,2024-03-02 13:33:44,0,1,4,80
+UTC-08:00 (PT) Pacific Time zone,3.0,4.0,0.0,2.0,7.0,Fitbit watch,Fitbit Charge 5,ctrl-treat,3.0,3.0,0,2024-03-01 12:08:34,1,1,4,80
+UTC-08:00 (PT) Pacific Time zone,3.0,4.0,0.0,2.0,7.0,Fitbit watch,Fitbit Charge 5,ctrl-treat,3.0,3.0,1,2024-03-08 08:10:32,1,2,4,73
+UTC-08:00 (PT) Pacific Time zone,2.0,4.0,0.0,2.0,8.0,Apple watch,Apple Watch series 7,treat-ctrl,3.0,3.0,0,2024-03-08 08:37:28,2,2,4,59
+UTC-08:00 (PT) Pacific Time zone,2.0,4.0,0.0,2.0,8.0,Apple watch,Apple Watch series 7,treat-ctrl,2.0,4.0,1,2024-03-01 09:39:48,2,1,4,63
+UTC-08:00 (PT) Pacific Time zone,3.0,3.0,0.0,2.0,8.0,Samsung Galaxy watch,Samsung Galaxy 5,ctrl-treat,3.0,2.0,0,2024-03-01 08:23:52,3,1,4,78
+UTC-08:00 (PT) Pacific Time zone,3.0,3.0,0.0,2.0,8.0,Samsung Galaxy watch,Samsung Galaxy 5,ctrl-treat,3.0,3.0,1,2024-03-08 18:45:57,3,2,4,82
+UTC-08:00 (PT) Pacific Time zone,4.0,4.0,0.0,3.0,8.0,Apple watch,Series 9,treat-ctrl,4.0,3.0,0,2024-03-09 09:57:31,4,2,4,94
+UTC-08:00 (PT) Pacific Time zone,4.0,4.0,0.0,3.0,8.0,Apple watch,Series 9,treat-ctrl,4.0,3.0,1,2024-03-01 08:56:46,4,1,4,93
+UTC-08:00 (PT) Pacific Time zone,4.0,3.0,1.0,2.0,8.0,Fitbit watch,Versa 3,ctrl-treat,3.0,2.0,0,2024-03-01 17:59:12,5,1,4,82
+UTC-08:00 (PT) Pacific Time zone,4.0,3.0,1.0,2.0,8.0,Fitbit watch,Versa 3,ctrl-treat,2.0,3.0,1,2024-03-08 10:52:21,5,2,4,71
+UTC-05:00 (ET) Eastern Time zone,3.0,3.0,1.0,2.0,9.0,Fitbit watch,Charge 2,ctrl-treat,3.0,3.0,0,2024-03-10 15:33:35,6,1,4,85
+UTC-05:00 (ET) Eastern Time zone,3.0,3.0,1.0,2.0,9.0,Fitbit watch,Charge 2,ctrl-treat,3.0,3.0,1,2024-03-17 10:05:44,6,2,4,
+UTC-08:00 (PT) Pacific Time zone,3.0,4.0,1.0,2.0,9.0,Garmin watch,Forerunner 945,treat-ctrl,3.0,3.0,0,2024-03-12 08:41:39,7,2,4,79
+UTC-08:00 (PT) Pacific Time zone,3.0,4.0,1.0,2.0,9.0,Garmin watch,Forerunner 945,treat-ctrl,3.0,3.0,1,2024-03-05 13:48:39,7,1,4,83
+UTC-06:00 (CT) Central Time zone,3.0,2.0,1.0,6.0,9.0,Apple watch,Apple Watch SE,ctrl-treat,3.0,1.0,0,2024-03-09 14:31:58,8,1,4,70
+UTC-06:00 (CT) Central Time zone,3.0,2.0,1.0,6.0,9.0,Apple watch,Apple Watch SE,ctrl-treat,2.0,3.0,1,2024-03-17 17:49:36,8,2,4,49
+UTC-08:00 (PT) Pacific Time zone,3.0,1.0,0.0,2.0,7.0,Garmin watch,Forerunner 255,ctrl-treat,4.0,1.0,0,2024-03-08 08:17:12,9,1,4,88
+UTC-08:00 (PT) Pacific Time zone,3.0,1.0,0.0,2.0,7.0,Garmin watch,Forerunner 255,ctrl-treat,4.0,1.0,1,2024-03-20 08:18:24,9,2,4,95
+UTC-08:00 (PT) Pacific Time zone,4.0,4.0,0.0,2.0,9.0,Apple watch,Ultra,ctrl-treat,4.0,3.0,0,2024-03-08 09:56:34,10,1,4,73
+UTC-08:00 (PT) Pacific Time zone,4.0,4.0,0.0,2.0,9.0,Apple watch,Ultra,ctrl-treat,5.0,1.0,1,2024-03-15 16:20:25,10,2,4,87
+UTC-08:00 (PT) Pacific Time zone,4.0,3.0,0.0,2.0,8.0,Garmin watch,Forerunner 945 LTE,treat-ctrl,4.0,2.0,0,2024-03-15 09:55:33,11,2,4,82
+UTC-08:00 (PT) Pacific Time zone,4.0,3.0,0.0,2.0,8.0,Garmin watch,Forerunner 945 LTE,treat-ctrl,3.0,2.0,1,2024-03-10 07:25:00,11,1,4,79
+UTC-08:00 (PT) Pacific Time zone,4.0,4.0,0.0,4.0,8.0,Apple watch,Apple Watch Series 9,ctrl-treat,2.0,4.0,0,2024-03-28 09:11:06,12,1,4,36
+UTC-08:00 (PT) Pacific Time zone,4.0,4.0,0.0,4.0,8.0,Apple watch,Apple Watch Series 9,ctrl-treat,3.0,3.0,1,2024-03-28 09:12:09,12,2,4,80
+UTC-06:00 (CT) Central Time zone,3.0,4.0,0.0,3.0,19.0,Samsung Galaxy watch,,treat-ctrl,3.0,4.0,0,2024-03-24 22:03:24,13,2,4,84
+UTC-06:00 (CT) Central Time zone,3.0,4.0,0.0,3.0,19.0,Samsung Galaxy watch,,treat-ctrl,3.0,4.0,1,2024-03-18 21:44:07,13,1,4,89
+UTC-06:00 (CT) Central Time zone,2.0,4.0,0.0,2.0,5.0,Samsung Galaxy watch,Galaxy Watch 4,treat-ctrl,1.0,4.0,0,2024-03-23 22:33:23,14,2,4,68
+UTC-06:00 (CT) Central Time zone,2.0,4.0,0.0,2.0,5.0,Samsung Galaxy watch,Galaxy Watch 4,treat-ctrl,3.0,2.0,1,2024-03-17 06:12:07,14,1,4,69
+UTC-06:00 (CT) Central Time zone,4.0,2.0,0.0,3.0,7.0,Apple watch,Apple Watch Series 6. Model A2292,ctrl-treat,3.0,2.0,0,2024-03-17 18:32:11,15,1,4,60
+UTC-06:00 (CT) Central Time zone,4.0,2.0,0.0,3.0,7.0,Apple watch,Apple Watch Series 6. Model A2292,ctrl-treat,3.0,2.0,1,2024-03-22 11:29:05,15,2,4,91
+UTC-06:00 (CT) Central Time zone,4.0,2.0,0.0,3.0,8.0,Other device,SMART WATCH-400/SW,treat-ctrl,3.0,2.0,0,2024-03-24 11:33:10,16,2,4,56
+UTC-06:00 (CT) Central Time zone,4.0,2.0,0.0,3.0,8.0,Other device,SMART WATCH-400/SW,treat-ctrl,4.0,2.0,1,2024-03-17 18:59:43,16,1,4,85
+UTC-06:00 (CT) Central Time zone,4.0,3.0,1.0,2.0,8.0,Fitbit watch,none,ctrl-treat,4.0,2.0,0,2024-03-15 10:22:34,17,1,4,77
+UTC-06:00 (CT) Central Time zone,4.0,3.0,1.0,2.0,8.0,Fitbit watch,none,ctrl-treat,4.0,3.0,1,2024-03-29 06:15:40,17,2,4,79
+UTC-06:00 (CT) Central Time zone,3.0,4.0,1.0,2.0,7.0,Apple watch,None,treat-ctrl,3.0,3.0,0,2024-03-28 16:24:04,18,2,4,95
+UTC-06:00 (CT) Central Time zone,3.0,4.0,1.0,2.0,7.0,Apple watch,None,treat-ctrl,4.0,3.0,1,2024-03-19 13:37:53,18,1,4,94
+UTC-06:00 (CT) Central Time zone,4.0,2.0,1.0,2.0,8.0,Apple watch,Ultra 2,ctrl-treat,3.0,2.0,0,2024-03-15 17:57:14,19,1,4,93
+UTC-06:00 (CT) Central Time zone,4.0,2.0,1.0,2.0,8.0,Apple watch,Ultra 2,ctrl-treat,4.0,1.0,1,2024-03-24 21:33:26,19,2,4,80
+UTC-06:00 (CT) Central Time zone,4.0,2.0,1.0,4.0,7.0,Garmin watch,Garmin Fenix 6s,treat-ctrl,5.0,2.0,0,2024-04-02 15:38:12,20,2,4,76
+UTC-06:00 (CT) Central Time zone,4.0,2.0,1.0,4.0,7.0,Garmin watch,Garmin Fenix 6s,treat-ctrl,4.0,3.0,1,2024-03-24 19:09:56,20,1,4,79
+UTC-06:00 (CT) Central Time zone,3.0,3.0,1.0,5.0,8.0,Apple watch,SE GPS 2a gen,ctrl-treat,3.0,3.0,0,2024-03-23 10:20:10,21,1,4,81
+UTC-06:00 (CT) Central Time zone,3.0,3.0,1.0,5.0,8.0,Apple watch,SE GPS 2a gen,ctrl-treat,2.0,3.0,1,2024-03-30 10:49:02,21,2,4,94

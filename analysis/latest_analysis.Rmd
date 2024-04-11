@@ -96,10 +96,20 @@ summary(model_watch)
 
 ```
 
+```{r}
+data$day <- factor(data$day)
+
+model_day <- lm(sleep_score ~ day, data=data)
+
+summary(model_day)
+```
+
+
 ```{r regression table, include=TRUE, results='asis', warning = FALSE, echo = FALSE}
 stargazer(model_base, 
           model_prevsleep, 
           model_complete,
+          model_individual,
           type = 'latex',
           title='Regression Results of Sleep Score',
           dep.var.labels = 'Sleep Score',
@@ -114,12 +124,14 @@ stargazer(model_base,
                                ),
           se = list(robust_base, 
                     robust_prevsleep, 
-                    robust_complete),
+                    robust_complete,
+                    robust_individual),
           # column.sep.width = "-10pt",
-          # single.row = TRUE,
+          single.row = TRUE,
           column.labels = c("Base Model", 
                             "Previous Sleep Info",
-                            "Demographic Info"),
+                            "Demographic Info",
+                            "By Individual"),
           notes = "HC robust standard errors in parantheses.",
           font.size = "small",
           no.space = TRUE,
@@ -127,29 +139,24 @@ stargazer(model_base,
           )
 ```
 
-```{r regression table, include=TRUE, results='asis', warning = FALSE, echo = FALSE}
-stargazer(model_week, 
-          model_watch, 
-          #model_individual,
+```{r regression table2, include=TRUE, results='asis', warning = FALSE, echo = FALSE}
+stargazer(model_week,
+          model_watch,
           type = 'latex',
           title='Regression Results of Sleep Score',
           dep.var.labels = 'Sleep Score',
           order="Constant",
           covariate.labels = c("(Intercept)",
                                "Week of Experiment",
-                               "Fitbit Watch",
-                               "Garmin Watch",
-                               "Other smartwatch"
+                               "Sunglasses Treatment"
                                ),
-          se = list(robust_week, 
-                    robust_watch 
-                    #robust_individual
+          se = list(robust_week,
+                    robust_watch
                     ),
           # column.sep.width = "-10pt",
           # single.row = TRUE,
-          column.labels = c("Model by Week of Experiment", 
-                            "Model by Watch brand",
-                            "Model by Individual"),
+          column.labels = c("Model by Week of Experiment",
+                            "Model by Watch"),
           notes = "HC robust standard errors in parantheses.",
           font.size = "small",
           no.space = TRUE,

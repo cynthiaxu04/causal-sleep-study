@@ -1,0 +1,158 @@
+---
+title: "Effects of Reducing Visible Light on Sleep Quality"
+subtitle: "2024 Spring 241 Final Project"
+author: "Cynthia Xu, Emanuel Mejia, Jonathan Luo, Rina Palta"
+date: "4/18/2024"
+output:
+  pdf_document:
+    number_sections: yes
+    fig_caption: True 
+---
+
+```{r global options, include = FALSE}
+knitr::opts_chunk$set(include = FALSE, message = FALSE, warning = FALSE)
+
+knitr::knit_engines$set(problem_description = function(options) {
+  code <- paste(options$code, collapse = "\n")
+})
+```
+
+```{r import libraries}
+library(data.table)
+library(sandwich)
+library(lmtest)
+library(ggplot2)
+library(knitr)
+library(stargazer)
+```
+
+```{r with unpaired data}
+data <- fread("../data/cleaned_data_long.csv")
+```
+
+```{r base model}
+model_base <- lm(sleep_score ~ treat, data = data)
+
+robust_base <- sqrt(diag(vcovHC(model_base, type="HC1")))
+
+summary(model_base)
+```
+
+```{r multivariate regression}
+model_base_multi <- lm(cbind(sleep_score, phase_sq, phase_ts) ~ treat, data = data)
+
+robust_multi <- sqrt(diag(vcovHC(model_base_multi, type="HC1")))
+
+summary(model_base_multi)
+```
+
+
+```{r model with previous sleep health subjective data}
+model_prevsleep <- lm(sleep_score ~ treat + sleep_quality + 
+                        trouble_sleep + total_sleep, 
+                      data = data)
+robust_prevsleep <- sqrt(diag(vcovHC(model_prevsleep, type="HC1")))
+
+summary(model_prevsleep)
+```
+
+```{r model with demographic variables}
+model_complete <- lm(
+  sleep_score ~ treat + sleep_quality + trouble_sleep + 
+    total_sleep + age_group + gender, 
+  data = data)
+robust_complete <- sqrt(diag(vcovHC(model_complete, type="HC1")))
+
+summary(model_complete)
+```
+
+
+```{r model looking at sleep scores by week, regardless of treat or ctrl phase}
+model_week <- lm(sleep_score ~ week, data = data)
+
+robust_week <- sqrt(diag(vcovHC(model_week, type="HC1")))
+
+summary(model_week)
+```
+
+```{r model with individual as factor}
+data$participant_id <- factor(data$participant_id)
+
+model_individual <- lm(sleep_score ~ treat + participant_id, data=data)
+
+robust_individual <- sqrt(diag(vcovHC(model_individual, type="HC1")))
+
+summary(model_individual)
+```
+
+```{r model with watch brand as factor}
+data$watch <- factor(data$watch)
+
+model_watch <- lm(sleep_score ~ treat + watch, data=data)
+
+robust_watch <- sqrt(diag(vcovHC(model_watch, type="HC1")))
+
+summary(model_watch)
+
+```
+
+```{r regression table, include=TRUE, results='asis', warning = FALSE, echo = FALSE}
+stargazer(model_base, 
+          model_prevsleep, 
+          model_complete,
+          type = 'latex',
+          title='Regression Results of Sleep Score',
+          dep.var.labels = 'Sleep Score',
+          order="Constant",
+          covariate.labels = c("(Intercept)",
+                               "Sunglasses Treatment",
+                               "Sleep Quality",
+                               "Trouble Sleeping",
+                               "Typical Total Sleep",
+                               "Age Group",
+                               "Gender"
+                               ),
+          se = list(robust_base, 
+                    robust_prevsleep, 
+                    robust_complete),
+          # column.sep.width = "-10pt",
+          # single.row = TRUE,
+          column.labels = c("Base Model", 
+                            "Previous Sleep Info",
+                            "Demographic Info"),
+          notes = "HC robust standard errors in parantheses.",
+          font.size = "small",
+          no.space = TRUE,
+          header = FALSE
+          )
+```
+
+```{r regression table, include=TRUE, results='asis', warning = FALSE, echo = FALSE}
+stargazer(model_week, 
+          model_watch, 
+          #model_individual,
+          type = 'latex',
+          title='Regression Results of Sleep Score',
+          dep.var.labels = 'Sleep Score',
+          order="Constant",
+          covariate.labels = c("(Intercept)",
+                               "Week of Experiment",
+                               "Fitbit Watch",
+                               "Garmin Watch",
+                               "Other smartwatch"
+                               ),
+          se = list(robust_week, 
+                    robust_watch 
+                    #robust_individual
+                    ),
+          # column.sep.width = "-10pt",
+          # single.row = TRUE,
+          column.labels = c("Model by Week of Experiment", 
+                            "Model by Watch brand",
+                            "Model by Individual"),
+          notes = "HC robust standard errors in parantheses.",
+          font.size = "small",
+          no.space = TRUE,
+          header = FALSE
+          )
+```

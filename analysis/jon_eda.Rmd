@@ -55,34 +55,16 @@ No stat sig relationship between subjective measures and treatment
 
 Cluster model. Accounts each individual sleep score per a subject-treat as a cluster.Cluster is per subject, or subject and treat phase?? #TODO
 
-```{r}
-# Create table with one row for each subject + sleep_score
-
-ctrl_long = data[, c(1, 13,15,17,19)]
-ctrl_long = melt(ctrl_long, id.vars = 'participant_id', measure.vars = c('day1_ss_ctrl', 'day2_ss_ctrl', 'day3_ss_ctrl', 'day4_ss_ctrl'))
-ctrl_long[, treat:= 0]
-
-treat_long = data[, c(1, 14,16,18,20)]
-treat_long = melt(treat_long, id.vars = 'participant_id', measure.vars = c('day1_ss_treat', 'day2_ss_treat', 'day3_ss_treat', 'day4_ss_treat'))
-treat_long[, treat:= 1]
-
-# Combine control and treat
-ss_dt <- rbind(ctrl_long, treat_long)
-
-setnames(ss_dt, 'value', 'sleep_score')
-#TODO My want to handle NA
-```
-
 With table in long form, run a simple model and a cluster model for comparison.
 
 ```{r}
-model_simple = ss_dt[, lm(sleep_score~treat)]
+model_simple = data_long[, lm(sleep_score~treat)]
 summary(model_simple)
 ```
 
 ```{r}
 # Cluster model, with cluster based on participant_id
-model_cluster <- ss_dt[, lm(sleep_score ~ treat + as.factor(participant_id))]
+model_cluster <- data_long[, lm(sleep_score ~ treat + as.factor(participant_id))]
 
 # We cluster on treat #TODO?? Since it is paired test, we have to differentiate a subjects control and treatment ss as separate clusters
 coeftest(model_cluster, vcov = vcovCL(model_cluster, cluster = ss_dt[, participant_id]))
@@ -131,3 +113,29 @@ Average increase in sleep score by 1.2 from phase 1 for phase 2, regardless of t
 Other hetergenous treatment effects?
 
 Visual of sleep scores over time
+
+# Using Cluster Individual method for ALL models after SIMPLE
+
+There is alot of data being left on the table. We have to think why we are doing a paired study
+
+1.  It gives us double the amount of data to work with
+2.  It controls for inter-subject including inter-device variance. We are leaving alot of this power on the table by not using repeated measures regression.
+
+```{r model with individual as factor}
+data$participant_id <- factor(data$participant_id)
+
+model_individual <- lm(sleep_score ~ treat + participant_id, data=data)
+
+robust_individual <- sqrt(diag(vcovHC(model_individual, type="HC1")))
+
+summary(model_individual)
+```
+
+```{r model with previous sleep health subjective data}
+model_prevsleep <- lm(sleep_score ~ treat + sleep_quality + 
+                        trouble_sleep + total_sleep, 
+                      data = data)
+robust_prevsleep <- sqrt(diag(vcovHC(model_prevsleep, type="HC1")))
+
+summary(model_prevsleep)
+```

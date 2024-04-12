@@ -1,0 +1,133 @@
+---
+title: "jon_EDA"
+output: html_document
+date: "2024-04-04"
+---
+
+```{r setup, message=FALSE, warning=FALSE}
+library(data.table)
+library(tidyverse)
+library(lmtest)
+library(sandwich)
+```
+
+```{r read data}
+data <- fread("../data/paired_cleaned_data.csv")
+data_treat <- fread("../data/cleaned_data_w_assign.csv")
+data_long <- fread("../data/cleaned_data_long.csv")
+```
+
+```{r}
+
+
+```
+
+Relationship between subjective measures and sleep scores?
+
+```{r}
+# Average of sleep scrores for each subject-phase 
+data_treat[, sleep_score_mean := rowMeans(.SD, na.rm = TRUE), .SDcols = c("day1_ss", "day2_ss", "day3_ss", "day4_ss")]
+```
+
+# Association between Sleep Score and Subjective Measures
+
+```{r}
+summary(data_treat[, lm(sleep_score_mean ~ phase_sq)])
+```
+
+```{r}
+summary(data_treat[, lm(sleep_score_mean ~ phase_ts)])
+```
+
+Stat sig evaluations of these relationships supports the use of sleep score measures for outcome measure.
+
+```{r}
+summary(data_treat[, lm(phase_sq ~ treat)])
+```
+
+```{r}
+summary(data_treat[, lm(phase_ts ~ treat)])
+```
+
+No stat sig relationship between subjective measures and treatment
+
+# Cluster Model
+
+Cluster model. Accounts each individual sleep score per a subject-treat as a cluster.Cluster is per subject, or subject and treat phase?? #TODO
+
+```{r}
+# Create table with one row for each subject + sleep_score
+
+ctrl_long = data[, c(1, 13,15,17,19)]
+ctrl_long = melt(ctrl_long, id.vars = 'participant_id', measure.vars = c('day1_ss_ctrl', 'day2_ss_ctrl', 'day3_ss_ctrl', 'day4_ss_ctrl'))
+ctrl_long[, treat:= 0]
+
+treat_long = data[, c(1, 14,16,18,20)]
+treat_long = melt(treat_long, id.vars = 'participant_id', measure.vars = c('day1_ss_treat', 'day2_ss_treat', 'day3_ss_treat', 'day4_ss_treat'))
+treat_long[, treat:= 1]
+
+# Combine control and treat
+ss_dt <- rbind(ctrl_long, treat_long)
+
+setnames(ss_dt, 'value', 'sleep_score')
+#TODO My want to handle NA
+```
+
+With table in long form, run a simple model and a cluster model for comparison.
+
+```{r}
+model_simple = ss_dt[, lm(sleep_score~treat)]
+summary(model_simple)
+```
+
+```{r}
+# Cluster model, with cluster based on participant_id
+model_cluster <- ss_dt[, lm(sleep_score ~ treat + as.factor(participant_id))]
+
+# We cluster on treat #TODO?? Since it is paired test, we have to differentiate a subjects control and treatment ss as separate clusters
+coeftest(model_cluster, vcov = vcovCL(model_cluster, cluster = ss_dt[, participant_id]))
+```
+
+# HTE of Assignment Order Subgroups
+
+Difference between Control-Treat, Treat Control? Is there difference in effects based on order of assigned control and treatment?
+
+```{r}
+# Non-cluster model, HTEs across treatment order
+#order_simple_model <- data_treat[, lm(sleep_score_mean ~ treat + Assignment + (treat * Assignment))]
+#summary(order_simple_model)
+
+# Cluster model, HTEs across treatment order
+order_cluster_model <- data_long[, lm(sleep_score ~ treat + Assignment + (treat * Assignment) + as.factor(participant_id))]
+coeftest(order_cluster_model, vcov = vcovCL(order_cluster_model, cluster = data_long[, participant_id]))
+```
+
+Cluster models on treatment order subgroups.
+
+```{r}
+# Control then treat
+summary(data_long[Assignment == 'ctrl-treat', lm(sleep_score ~ treat + as.factor(participant_id))])
+# Treat then control
+summary(data_long[Assignment == 'treat-ctrl', lm(sleep_score ~ treat + as.factor(participant_id))])
+```
+
+Control-Treatment has positive treatment effect while Treatment-Control exhibited a negative treatment effect. Either effect is statistically significant.
+
+# Effect of Time, or participating in study?
+
+In both treatment order cases, there is an increase in average sleep score from phase 1 to phase 2 (week 1 to week 2) of the study. Could this be an effect of subjects knowing they are being studied (confounder)? This is not a blinded study.
+
+```{r}
+# Cluster model, regress sleep scores on week
+time_cluster_model <- data_long[, lm(sleep_score ~ week + as.factor(participant_id))]
+summary(time_cluster_model)
+coeftest(time_cluster_model, vcov = vcovCL(time_cluster_model, cluster = data_long[, participant_id]))
+```
+
+Average increase in sleep score by 1.2 from phase 1 for phase 2, regardless of treatment assignment order. Not practically nor statistically significant.
+
+# Other
+
+Other hetergenous treatment effects?
+
+Visual of sleep scores over time

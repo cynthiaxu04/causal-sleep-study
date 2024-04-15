@@ -1,3 +1,16 @@
+---
+title: "Effects of Reducing Visible Light on Sleep Quality"
+subtitle: "2024 Spring 241 Final Project"
+author: "Cynthia Xu, Emanuel Mejia, Jonathan Luo, Rina Palta"
+date: "4/18/2024"
+output:
+  pdf_document:
+    number_sections: yes
+    fig_caption: True
+header-includes:
+   - \usepackage{rotating, graphicx}
+---
+
 ```{r import libraries}
 library(data.table)
 library(sandwich)
@@ -5,66 +18,136 @@ library(lmtest)
 library(ggplot2)
 library(knitr)
 library(stargazer)
+library(kableExtra)
+library(dplyr)
+library(ggpubr)
 ```
+
 ```{r with unpaired data}
-data_2 <- fread("../data/cleaned_data.csv")
+# Short Format Table
+data <- fread("../data/cleaned_data.csv")
+data[, avg_ss := rowMeans(.SD, na.rm = TRUE), .SDcols = c("day1_ss", "day2_ss", "day3_ss", "day4_ss")]
 
-data_2[, avg_ss := rowMeans(.SD, na.rm = TRUE), .SDcols = c("day1_ss", "day2_ss", "day3_ss", "day4_ss")]
+# Long Format Table
+data_long <- fread("../data/cleaned_data_long.csv")
+data_long <- na.omit(data_long)
 
-model <- lm(avg_ss ~ treat, data = data_2)
-summary(model)
+# Base Model
+model_base <- lm(avg_ss ~ treat, data = data)
+robust_base <- sqrt(diag(vcovHC(model_base, type="HC1")))
+
+# Model adding with participants' Demographic Info
+model_prevsleep <- lm(avg_ss ~ treat + sleep_quality + 
+                        trouble_sleep + total_sleep, 
+                      data = data)
+robust_prevsleep <- sqrt(diag(vcovHC(model_prevsleep, type="HC1")))
+
+# Model adding with participants' Demographic Info
+model_demog <- lm(
+  avg_ss ~ treat + sleep_quality + trouble_sleep + 
+    total_sleep + age_group + gender, 
+  data = data)
+robust_demog <- sqrt(diag(vcovHC(model_demog, type="HC1")))
+
+# Model with participants' Fixed Effects
+model_fixed <- lm(
+  avg_ss ~ treat + as.factor(participant_id),
+  data = data)
+robust_complete <- sqrt(diag(vcovHC(model_fixed, type="HC1")))
+
+# Model with participants' individual data points
+# data_long$participant_id <- factor(data_long$participant_id)
+model_individual <- lm(
+  sleep_score ~ treat + as.factor(participant_id), 
+  data = data_long)
+robust_individual <- sqrt(diag(vcovHC(model_individual, type="HC1")))
+```
+
+```{r regression table, include=TRUE, warning=FALSE, render=FALSE, echo=FALSE, error=FALSE, message=FALSE, results='asis'}
+stargazer(model_base, 
+          model_prevsleep, 
+          model_demog,
+          model_fixed,
+          model_individual,
+          type = 'latex',
+          title='Sleep Score Regression Results',
+          dep.var.labels = c('Mean Sleep Score','Sleep Score'),
+          order="Constant",
+          covariate.labels = c("(Intercept)",
+                               "Sunglasses Treatment",
+                               "Sleep Quality",
+                               "Trouble Sleeping",
+                               "Typical Total Sleep",
+                               "Age Group",
+                               "Gender (Female)"
+                               ),
+          se = list(robust_base, 
+                    robust_prevsleep, 
+                    robust_demog, 
+                    robust_complete),
+          # column.sep.width = "-10pt",
+          # single.row = TRUE,
+          omit = c("participant_id"),
+          add.lines=list(c('Participant Fixed effects',
+                           'No', 'No', 'No', 'Yes', 'Yes')),
+          column.labels = c("Base Model", 
+                            "Previous Sleep Info",
+                            "Demographic Info",
+                            "FE by Participant",
+                            "Individual Datapoints"),
+          notes = "HC robust standard errors in parantheses.",
+          float.env = "sidewaystable",
+          font.size = "small",
+          no.space = TRUE,
+          header = FALSE
+          )
 ```
 
 ```{r}
-head(data_2)
-```
-
-```{r}
-model_2 <- lm(avg_ss ~ treat + gender, data = data_2)
-summary(model_2)
-```
-```{r}
-coefs_cluster <- coeftest(
-  model_2, 
-  vcov = vcovCL(
-    model_2, 
-    cluster = data_2[ , watch]
-    )
+data_survey <- select(
+  data, c('sleep_quality','trouble_sleep','total_sleep', 
+          'phase_sq', 'phase_ts', 'treat', 'age_group', 'gender', 'participant_id')
   )
-
-coefs_cluster
+stargazer(data_survey, type = "text", title="Descriptive statistics", digits=1)
 ```
 
-```{r}
-model_3 <- lm(avg_ss ~ treat + gender + age_group + sleep_quality, data = data_2)
-summary(model_3)
-```
-```{r}
-coefs_cluster_3 <- coeftest(
-  model_3, 
-  vcov = vcovCL(
-    model_3, 
-    cluster = data_2[ , watch]
-    )
+```{r include=TRUE, warning=FALSE, render=FALSE, echo=FALSE, error=FALSE, message=FALSE, results='asis'}
+
+data_prevsleep <- data_survey[ , .(
+  'Sleep Quality (Likert 1-5)' = mean(sleep_quality),
+  'TroubleSleep (Likert 1-5)' = mean(trouble_sleep),
+  'Total Sleep (Hours)' = mean(total_sleep)
+  ),
+  by = participant_id]
+data_prevsleep[, participant_id := NULL]
+
+stargazer(
+  data_prevsleep, 
+  type = "latex", 
+  title="Previous Sleep - Descriptive statistics",
+  digits=1,
+  header = FALSE
   )
-
-coefs_cluster_3
-```
-
-```{r}
-model_sq <- lm(phase_sq ~ treat + gender + age_group + sleep_quality, data = data_2)
-summary(model_sq)
 ```
 ```{r}
-coefs_cluster_sq <- coeftest(
-  model_sq, 
-  vcov = vcovCL(
-    model_sq, 
-    cluster = data_2[ , watch]
-    )
-  )
+data_demog <- data_survey[ , .(
+  age_group = mean(age_group),
+  gender = mean(gender)
+  ),
+  by = participant_id]
 
-coefs_cluster_sq
+data_demog[, Gender := 'Female']
+data_demog[gender == 0, Gender := 'Male']
+data_demog[, Age := '25-34']
+data_demog[age_group == 3, Age := '35-44']
+data_demog[age_group == 4, Age := '45-54']
+data_demog[age_group == 5, Age := '55-64']
+data_demog[age_group == 6, Age := '65+']
+
+# Crosstable Gender-Age
+xtab_ag <- xtabs(~ Gender + Age, data=data_demog)
+xtab_ag %>%
+  kable(format = "latex", booktabs = T, caption = "Age Group - Gender Distribution")
 ```
 
 
@@ -77,25 +160,26 @@ data[, avg_ss_treat := rowMeans(.SD, na.rm = TRUE), .SDcols = c("day1_ss_treat",
 ```
 
 ```{r distribution of data}
-cols_to_plot <- c("avg_ss_ctrl", "avg_ss_treat", "phase_sq_ctrl", 
-                  "phase_sq_treat", "phase_ts_ctrl", "phase_ts_treat", 
-                  "sleep_quality", "trouble_sleep", "total_sleep")
-
-for (col in cols_to_plot) {
-  hist(data[[col]], main=paste("Histogram of", col), xlab="Values", ylab="Frequency")
-}
+# cols_to_plot <- c("avg_ss_ctrl", "avg_ss_treat", "phase_sq_ctrl", 
+#                   "phase_sq_treat", "phase_ts_ctrl", "phase_ts_treat", 
+#                   "sleep_quality", "trouble_sleep", "total_sleep")
+# 
+# for (col in cols_to_plot) {
+#   hist(data[[col]], main=paste("Histogram of", col), xlab="Values", ylab="Frequency")
+# }
 
 ```
-```{r}
+
+```{r hist-density plots, out.width="50%", warning=FALSE, echo=FALSE, error=FALSE, fig.show="hold"}
 hist_ctrl <-  ggplot() + 
   geom_histogram(
-    aes(data$avg_ss_ctrl),
+    aes(data_long[treat == 0, sleep_score]),
     fill = "#0099F8",
     color="black",
-    bins = 8,
+    breaks = seq(30,100,10),
     alpha = 0.6) +
   labs(
-    title = "Average Sleep Score",
+    title = "Sleep Score Distribution",
     subtitle = "Control Phase",
     x = "Sleep Score",
     y = "Frequency"
@@ -112,18 +196,21 @@ hist_ctrl <-  ggplot() +
                               size = 10,
                               face = "bold"),
     axis.text = element_text(color = "#969696", size = 10),
-    axis.line = element_line(color = "#969696")
-  )
+    axis.line = element_line(color = "#969696"),
+    axis.ticks = element_line(color = "#969696")
+  ) + 
+  xlim(30,100) + 
+  ylim(0,35)
 
 hist_treat <-  ggplot() + 
   geom_histogram(
-    aes(data$avg_ss_treat),
+    aes(data_long[treat == 1, sleep_score]),
     fill = "#0099F8",
     color="black",
-    bins = 8,
+    breaks = seq(30,100,10),
     alpha = 0.6) +
   labs(
-    title = "Average Sleep Score",
+    title = "Sleep Score Distribution",
     subtitle = "Treatment Phase",
     x = "Sleep Score",
     y = "Frequency"
@@ -140,45 +227,87 @@ hist_treat <-  ggplot() +
                               size = 10,
                               face = "bold"),
     axis.text = element_text(color = "#969696", size = 10),
-    axis.line = element_line(color = "#969696")
-  )
-
+    axis.line = element_line(color = "#969696"),
+    axis.ticks = element_line(color = "#969696")
+  ) + 
+  xlim(30,100) +
+  ylim(0,35)
 
 hist_ctrl
 hist_treat
 ```
 
-```{r observations}
-# Observations on data:
-# Sleep scores are left-skewed (both from control and treatment phase)
-```
 
-```{r simple model}
-simple_model <- lm(avg_ss_treat ~ avg_ss_ctrl, data=data)
-
-summary(simple_model)
-```
-```{r model with total sleep, overall trouble sleeping, and overall sleep quality}
-overall_model <- lm(avg_ss_treat ~ avg_ss_ctrl + sleep_quality + trouble_sleep + total_sleep, data=data)
-
-summary(overall_model)
-```
-
-```{r model with phase Likert covariates}
-phase_model <- lm(avg_ss_treat ~ avg_ss_ctrl + phase_sq_ctrl + phase_sq_treat + phase_ts_ctrl + phase_ts_treat, data=data)
-
-summary(phase_model)
-```
-
-```{r paired t-test}
-paired_t <- t.test(data$avg_ss_ctrl, data$avg_ss_treat, paired=TRUE)
-
-?t.test
-print(paired_t)
-```
 ```{r}
-library(Hmisc)
-t.test(data$avg_ss_ctrl, data$avg_ss_treat, paired=TRUE, cluster = data$watch)
+ggscatter(data, x = "avg_ss_ctrl", y = "avg_ss_treat",
+          add = "reg.line", conf.int = TRUE,
+          palette = "Blues", color = "#0099F8",
+          cor.coef = TRUE, cor.method = "pearson",
+          xlab = "Sleep Score Control Phase", 
+          ylab = "Sleep Score Treatment Phase") +
+  theme_classic() +
+  labs(
+    title = "Sleep Score Correlation",
+    subtitle = "Control - Treatment",
+  )+
+  theme(
+    plot.title = element_text(color = "#0099F8",
+                              size = 17,
+                              face = "bold"),
+    plot.subtitle = element_text(size = 13, 
+                                 face = "italic",
+                                 color="#969696"),
+    axis.title = element_text(color = "#969696",
+                              size = 10,
+                              face = "bold"),
+    axis.text = element_text(color = "#969696", size = 10),
+    axis.line = element_line(color = "#969696"),
+    axis.ticks = element_line(color = "#969696")
+  ) + 
+  xlim(55,95) +
+  ylim(50,95)
 ```
 
+```{r}
+week_treat <- data_long[ , .(
+  sleep_score = mean(sleep_score)
+  ),
+  keyby = c('treat', 'week', 'Assignment')]
+
+week_treat[treat == 0, Treat := "Control"]
+week_treat[treat == 1, Treat := "Treatment"]
+
+ggplot(week_treat) + 
+  geom_point(
+    aes(x = week, 
+        y = sleep_score,
+        shape = Treat,
+        color = Assignment),
+    size = 5
+    ) +
+  geom_line(aes(x = week, 
+        y = sleep_score,
+        color = Assignment)) + 
+  theme_classic() +
+  labs(
+    title = "Sleep Score Evolution",
+    subtitle = "Per Week Per Group",
+    x = "Week",
+    y = "Sleep Score"
+  )+
+  theme(
+    plot.title = element_text(color = "#0099F8",
+                              size = 17,
+                              face = "bold"),
+    plot.subtitle = element_text(size = 13, 
+                                 face = "italic",
+                                 color="#969696"),
+    axis.title = element_text(color = "#969696",
+                              size = 10,
+                              face = "bold"),
+    axis.text = element_text(color = "#969696", size = 10),
+    axis.line = element_line(color = "#969696"),
+    axis.ticks = element_line(color = "#969696")
+  )
+```
 

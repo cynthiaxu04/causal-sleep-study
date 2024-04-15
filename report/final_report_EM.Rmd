@@ -57,6 +57,8 @@ CrossTable(data$gender, data$age_group)
 
 mydata <- data
 
+xtabs(~ gender + age_group, data=data)
+
 stargazer(mydata, type = "text", title="Descriptive statistics", digits=1)
 ```
 

@@ -32,7 +32,21 @@ data_treat[, sleep_score_mean := rowMeans(.SD, na.rm = TRUE), .SDcols = c("day1_
 # Association between Sleep Score and Subjective Measures
 
 ```{r}
-summary(data_treat[, lm(sleep_score_mean ~ phase_sq)])
+data_long_d4 = data_long[day==4]
+```
+
+```{r}
+summary(data_long[, lm(sleep_score ~ phase_sq)])
+```
+
+```{r}
+library(ggplot2)
+ggplot(data_long,
+       aes(y = sleep_score, phase_sq)) +
+  ggtitle("Subjective Score vs Device") + 
+  xlab("Subjective Sleep Quality") + ylab("Sleep Score") +
+  geom_point() +
+  stat_summary(aes(y = sleep_score,group=1), fun.y=mean, colour="blue", geom="line",group=1)
 ```
 
 ```{r}
@@ -44,6 +58,15 @@ summary(data_treat[, lm(phase_sq ~ phase_ts)])
 ```
 
 Stat sig evaluations of these relationships supports the use of sleep score measures for outcome measure.
+
+```         
+```
+
+```{r}
+
+```
+
+# Evaluate subjective measures against treatment
 
 ```{r}
 summary(data_treat[, lm(phase_sq ~ treat)])
@@ -70,6 +93,12 @@ model_base <- lm(sleep_score_mean ~ treat, data = data_treat)
 coeftest(model_base, vcovHC)
 ```
 
+```{r}
+# Regress on phase means, paired
+model_base <- lm(sleep_score_mean ~ treat + as.factor(participant_id), data = data_treat)
+coeftest(model_base, vcovHC)
+```
+
 ```{r prev sleep health}
 # Regress on Long Data
 # model_prevsleep <- lm(sleep_score ~ treat + sleep_quality + 
@@ -77,8 +106,13 @@ coeftest(model_base, vcovHC)
 #                       data = data_long)
 
 # Regress on Subject Phase Means
+# model_prevsleep <- lm(sleep_score_mean ~ treat + sleep_quality +
+#                         trouble_sleep + total_sleep,
+#                       data = data_treat)
+
+# Regress on Subject Phase Means With pairing. This seems to not work since the other covariates are exactly linearly dependent with participant ID. 
 model_prevsleep <- lm(sleep_score_mean ~ treat + sleep_quality +
-                        trouble_sleep + total_sleep,
+                        trouble_sleep + total_sleep + as.factor(participant_id),
                       data = data_treat)
 
 
@@ -105,6 +139,16 @@ coeftest(model_complete, vcovHC)
 car::vif(model_complete)
 ```
 
+# Try HTE of starting sleep quality
+
+```{r}
+model_hte <- lm(
+  sleep_score_mean ~ treat + sleep_quality + (treat * sleep_quality), 
+  data = data_treat)
+
+coeftest(model_hte, vcovHC)
+```
+
 # Cluster Model
 
 Cluster model. Accounts each individual sleep score per a subject-treat as a cluster.Cluster is per subject, or subject and treat phase?? #TODO
@@ -122,7 +166,8 @@ summary(model_simple)
 model_cluster <- data_long[, lm(sleep_score ~ treat + as.factor(participant_id))]
 
 # We cluster on treat #TODO?? Since it is paired test, we have to differentiate a subjects control and treatment ss as separate clusters
-coeftest(model_cluster, vcov = vcovCL(model_cluster, cluster = ss_dt[, participant_id]))
+#sqrt(diag(vcovHC(model_cluster, type="HC1")))
+coeftest(model_cluster, vcov = vcovCL(model_cluster, cluster = data_long[, participant_id]))
 ```
 
 # HTE of Assignment Order Subgroups

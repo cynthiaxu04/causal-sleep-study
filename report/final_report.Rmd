@@ -113,6 +113,10 @@ In our subsequent models, we add additional covariates to regress on. Prior to t
 
 Our fourth and fifth models however, where we factor by each individual participant in the study, gives insight on just how much variation there is in sleep quality/health from individual to individual. In the "Fixed Effects by Participant (4)” model, we see that mean sleep score can be highly impacted either positively or negatively by the individual. This is also the case when we look at individual rather than mean sleep score by participant. It is clear variables unobserved by this study’s scope contribute heavily to an individual’s sleep quality, for example, lifestyle, health history, etc.  
 
+Given the null result from our sunglasses treatment, we also examined other potential sources of effect. Because subjects experienced control and treatment phases in different orders, we examined whether sleep score was correlated with time. The motivating theory for this was that by the second week of the experiment, participants may have gained some level of awareness of their sleep habits due to participation and tracking and either consciously or unconsciously began to engage in sleep behaviors that could mute treatment effect. We find that although there was an average increase in sleep score over time, regardless of phase order, no statistically significant result was observed. No significant result was observed.  
+
+Similarly, we also looked at any potential differences in sleep score amongst activity tracker brands. Sleep score calculation is proprietary by brand; however, we made the initial assumption that any differences in calculation across brands would be negligible. We again observed no significant result.  
+
 
 ```{r regression table, include=TRUE, warning=FALSE, render=FALSE, echo=FALSE, error=FALSE, message=FALSE, results='asis'}
 stargazer(model_base, 
@@ -162,6 +166,7 @@ We found that, on average, participants did not experience a statistically signi
 
 \newpage
 \section{Appendix A}
+A list of eligible activity tracker models that have compatible sleep score technology are shown below. Subjects not having access to a device meeting model includability criteria were not accepted for study.  
 \begin{enumerate}
   \item Garmin - certain models, check \href{https://support.garmin.com/en-US/?faq=DWcdBazhr097VgqFufsTk8}{here} for sleep score compatibility
   \item Apple watch - all models
@@ -171,6 +176,20 @@ We found that, on average, participants did not experience a statistically signi
   \item Oura - all models
 
 \end{enumerate}
+
+As part of the analysis, we evaluated the correlation between participants’ subjective measures of sleep on a Likert scale and their activity tracker sleep scores. This helps us understand the effectiveness of device sleep scores, which use proprietary formulas with inputs from minimally invasive methods. We find a positive correlation, Adj $R^2$ of 0.17.  
+
+This below graph indicates the mean sleep score at each subjective score of sleep quality. It must be considered that subjective sleep quality is surveyed at the phase level at the end of each phase, so there is potential for availability bias. Additionally, we cannot know if activity sleep scores may have influenced participants’ own subjective measures of sleep. 
+
+```{r scatterplot, include=TRUE, warning=FALSE, render=FALSE, echo=FALSE, error=FALSE, message=FALSE}
+ggplot(data_long,
+       aes(y = sleep_score, phase_sq)) +
+  ggtitle("Subjective Score vs Device") + 
+  xlab("Subjective Sleep Quality") + ylab("Sleep Score") +
+  geom_point() +
+  stat_summary(aes(y = sleep_score,group=1), fun.y=mean, colour="blue", geom="line",group=1)
+```
+
 
 \section{References}
 1. Blume, C., Garbazza, C., & Spitschan, M. (2019). Effects of light on human circadian rhythms, sleep and mood. Somnologie, 23(3), 147.

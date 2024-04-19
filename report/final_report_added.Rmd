@@ -30,6 +30,7 @@ library(stargazer)
 library(kableExtra)
 library(dplyr)
 library(ggpubr)
+library(latex2exp)
 ```
 
 ```{r models, include=FALSE}
@@ -40,6 +41,11 @@ data[, avg_ss := rowMeans(.SD, na.rm = TRUE), .SDcols = c("day1_ss", "day2_ss", 
 # Long Format Table
 data_long <- fread("../data/cleaned_data_long.csv")
 data_long <- na.omit(data_long)
+
+# Paired data
+data_pair <- fread("../data/paired_cleaned_data.csv")
+data_pair[, avg_ss_ctrl := rowMeans(.SD, na.rm = TRUE), .SDcols = c("day1_ss_ctrl", "day2_ss_ctrl", "day3_ss_ctrl", "day4_ss_ctrl")]
+data_pair[, avg_ss_treat := rowMeans(.SD, na.rm = TRUE), .SDcols = c("day1_ss_treat", "day2_ss_treat", "day3_ss_treat", "day4_ss_treat")]
 
 # Base Model
 model_base <- lm(avg_ss ~ treat, data = data)
@@ -109,73 +115,93 @@ In all our regression models, we found the dependent variable and covariates tha
 
 ```{r hist-density plots, include=TRUE, out.width="50%", warning=FALSE, echo=FALSE, error=FALSE, fig.show="hold"}
 
-mean_ctrl <- mean(data$sleep_score[data$treat == 0])
-mean_treat <- mean(data$sleep_score[data$treat == 1])
-
-
 hist_ctrl <-  ggplot() + 
   geom_histogram(
-    aes(data[treat == 0, avg_ss]),
+    aes(data_pair[, avg_ss_ctrl]),
     fill = "#0099F8",
-    color="black",
+    color="white",
     breaks = seq(50,100,5),
     alpha = 0.6) +
-  geom_vline(xintercept = mean_ctrl, color = "red", linetype = "dashed", size = 1) + 
   labs(
-    title = "Sleep Score Distribution",
-    subtitle = "Control Phase",
-    x = "Sleep Score",
+    title = "Control Phase",
+    subtitle = "Average Sleep Score Distribution",
+    x = "Average Sleep Score",
     y = "Frequency"
   ) +
   theme_classic() +
   theme(
     plot.title = element_text(color = "#0099F8",
-                              size = 17,
+                              size = 18,
                               face = "bold"),
     plot.subtitle = element_text(color="#969696",
-                                   size = 12, 
+                                   size = 14, 
                                    face = "italic"),
     axis.title = element_text(color = "#969696",
-                              size = 10,
+                              size = 12,
                               face = "bold"),
-    axis.text = element_text(color = "#969696", size = 10),
+    axis.text = element_text(color = "#969696", size = 12),
     axis.line = element_line(color = "#969696"),
-    axis.ticks = element_line(color = "#969696")
+    axis.ticks = element_line(color = data_pair[, .(mean(avg_ss_ctrl))][,V1] - 0.8)
   ) + 
+  geom_vline(xintercept = data_pair[, .(mean(avg_ss_ctrl))][,V1], 
+             linetype = "dashed", color = "#001F82", size = 1) +
+  annotate(
+    geom='text', x = data_pair[, .(mean(avg_ss_ctrl))][,V1] - 1, 
+    y= 8, label=TeX("$\\mu", output='character'), 
+    parse=TRUE, color= "#001F82", size = 7) +
+  annotate(
+    geom='text', x = data_pair[, .(mean(avg_ss_ctrl))][,V1] - 0.8, 
+    y= -0.1, label = round(data_pair[, .(mean(avg_ss_ctrl))][,V1],2), 
+    parse=TRUE, color= "#001F82", size = 7) +
   xlim(50,100) + 
-  ylim(0,8)
+  ylim(0,8) + 
+  scale_x_continuous(breaks = c(50,60,70,data_pair[, .(mean(avg_ss_ctrl))][,V1], 80,90,100), labels = c("50","60","70",round(data_pair[, .(mean(avg_ss_ctrl))][,V1],1), "80","90","100")) +
+  theme(axis.text.x = element_text(color = c("#969696", "#969696", "#969696","#001F82", "#969696","#969696","#969696")),
+        axis.ticks.x = element_line(color = c("#969696","#969696","#969696","#001F82", "#969696","#969696","#969696")))
 
 hist_treat <-  ggplot() + 
   geom_histogram(
-    aes(data[treat == 1, avg_ss]),
+    aes(data_pair[, avg_ss_treat]),
     fill = "#0099F8",
-    color="black",
+    color="white",
     breaks = seq(50,100,5),
     alpha = 0.6) +
-  geom_vline(xintercept = mean_treat, color = "red", linetype = "dashed", size = 1) + 
   labs(
-    title = "Sleep Score Distribution",
-    subtitle = "Treatment Phase",
-    x = "Sleep Score",
+    title = "Treatment Phase",
+    subtitle = "Average Sleep Score Distribution",
+    x = "Average Sleep Score",
     y = "Frequency"
   ) +
   theme_classic() +
   theme(
     plot.title = element_text(color = "#0099F8",
-                              size = 17,
+                              size = 18,
                               face = "bold"),
     plot.subtitle = element_text(color="#969696",
-                                   size = 12, 
+                                   size = 14, 
                                    face = "italic"),
     axis.title = element_text(color = "#969696",
-                              size = 10,
+                              size = 12,
                               face = "bold"),
-    axis.text = element_text(color = "#969696", size = 10),
+    axis.text = element_text(color = "#969696", size = 12),
     axis.line = element_line(color = "#969696"),
     axis.ticks = element_line(color = "#969696")
   ) + 
+  geom_vline(xintercept = data_pair[, .(mean(avg_ss_treat))][,V1], 
+             linetype = "dashed", color = "#001F82", size = 1) +
+  annotate(
+    geom='text', x = data_pair[, .(mean(avg_ss_treat))][,V1] - 1, 
+    y= 8, label=TeX("$\\mu", output='character'), 
+    parse=TRUE, color= "#001F82", size = 7) +
+  annotate(
+    geom='text', x = data_pair[, .(mean(avg_ss_treat))][,V1] - 0.9, 
+    y= -0.01, label = round(data_pair[, .(mean(avg_ss_treat))][,V1],2), 
+    parse=TRUE, color= "#001F82", size = 4) +
   xlim(50,100) +
-  ylim(0,8)
+  ylim(0,8) + 
+  scale_x_continuous(breaks = c(50,60,70,data_pair[, .(mean(avg_ss_treat))][,V1], 80,90,100), labels = c("50","60","70",round(data_pair[, .(mean(avg_ss_treat))][,V1],1), "80","90","100")) +
+  theme(axis.text.x = element_text(color = c("#969696", "#969696", "#969696","#001F82", "#969696","#969696","#969696")),
+        axis.ticks.x = element_line(color = c("#969696","#969696","#969696","#001F82", "#969696","#969696","#969696")))
 
 hist_ctrl
 hist_treat
@@ -190,20 +216,22 @@ Our fourth and fifth models however, where we factor by each individual particip
 
 Given the null result from our sunglasses treatment, we also examined other potential sources of effect. Because subjects experienced control and treatment phases in different orders, we examined whether sleep score was correlated with time. The motivating theory for this was that by the second week of the experiment, participants may have gained some level of awareness of their sleep habits due to participation and tracking and either consciously or unconsciously began to engage in sleep behaviors that could mute treatment effect. We find that although there was an average increase in sleep score over time, regardless of phase order, no statistically significant result was observed. No significant result was observed.  
 
-```{r lineplot, include=TRUE, warning=FALSE, render=FALSE, echo=FALSE, error=FALSE, message=FALSE}
+```{r lineplot, include=TRUE, warning=FALSE, render=FALSE, echo=FALSE, error=FALSE, message=FALSE, out.width="70%", fig.align = 'center'}
 week_treat <- data_long[ , .(
   sleep_score = mean(sleep_score)
   ),
   keyby = c('treat', 'week', 'Assignment')]
 
-week_treat[treat == 0, Treat := "Control"]
-week_treat[treat == 1, Treat := "Treatment"]
+week_treat[treat == 0, Phase := "Control"]
+week_treat[treat == 1, Phase := "Treatment"]
+week_treat[Assignment == 'ctrl-treat', Assignment := "Control-Treat"]
+week_treat[Assignment == 'treat-ctrl', Assignment := "Treat-Control"]
 
 ggplot(week_treat) + 
   geom_point(
     aes(x = week, 
         y = sleep_score,
-        shape = Treat,
+        shape = Phase,
         color = Assignment),
     size = 5
     ) +
@@ -219,18 +247,20 @@ ggplot(week_treat) +
   )+
   theme(
     plot.title = element_text(color = "#0099F8",
-                              size = 17,
+                              size = 18,
                               face = "bold"),
-    plot.subtitle = element_text(size = 13, 
+    plot.subtitle = element_text(size = 14, 
                                  face = "italic",
                                  color="#969696"),
     axis.title = element_text(color = "#969696",
-                              size = 10,
+                              size = 12,
                               face = "bold"),
     axis.text = element_text(color = "#969696", size = 10),
     axis.line = element_line(color = "#969696"),
-    axis.ticks = element_line(color = "#969696")
-  )
+    axis.ticks = element_line(color = "#969696"),
+    legend.title = element_text(face = "bold")
+  ) + scale_color_manual(values=c('tomato1', '#0099F8')) +
+  scale_x_continuous(breaks = c(1,2))
 ```
 
 
@@ -300,13 +330,37 @@ As part of the analysis, we evaluated the correlation between participants’ su
 
 This below graph indicates the mean sleep score at each subjective score of sleep quality. It must be considered that subjective sleep quality is surveyed at the phase level at the end of each phase, so there is potential for availability bias. Additionally, we cannot know if activity sleep scores may have influenced participants’ own subjective measures of sleep. 
 
-```{r scatterplot, include=TRUE, warning=FALSE, render=FALSE, echo=FALSE, error=FALSE, message=FALSE}
+```{r scatterplot, include=TRUE, warning=FALSE, render=FALSE, echo=FALSE, error=FALSE, message=FALSE, out.width="70%", fig.align = 'center'}
 ggplot(data_long,
        aes(y = sleep_score, phase_sq)) +
-  ggtitle("Subjective Score vs Device") + 
-  xlab("Subjective Sleep Quality") + ylab("Sleep Score") +
-  geom_point() +
-  stat_summary(aes(y = sleep_score,group=1), fun.y=mean, colour="blue", geom="line",group=1)
+  ggtitle("Subjective Score vs Device Score") + 
+  xlab("Subjective Sleep Quality") + 
+  ylab("Sleep Score") +
+  geom_point(
+    alpha = 0.4,
+    size = 2,
+    color = "#969696"
+  ) +
+  stat_summary(aes(y = sleep_score,group=1),
+               fun.y=mean, colour="#0099F8", geom="line",
+               group=1, size = 1.5) +
+  theme_classic() +
+  theme(
+    plot.title = element_text(color = "#0099F8",
+                              size = 18,
+                              face = "bold"),
+    plot.subtitle = element_text(size = 14, 
+                                 face = "italic",
+                                 color="#969696"),
+    axis.title = element_text(color = "#969696",
+                              size = 12,
+                              face = "bold"),
+    axis.text = element_text(color = "#969696", size = 10),
+    axis.line = element_line(color = "#969696"),
+    axis.ticks = element_line(color = "#969696"),
+    legend.title = element_text(face = "bold"),
+    panel.grid.major = element_line(color = "gray90")
+  )
 ```
 
 

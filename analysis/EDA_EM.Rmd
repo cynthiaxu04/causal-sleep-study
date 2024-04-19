@@ -171,67 +171,94 @@ data[, avg_ss_treat := rowMeans(.SD, na.rm = TRUE), .SDcols = c("day1_ss_treat",
 ```
 
 ```{r hist-density plots, out.width="50%", warning=FALSE, echo=FALSE, error=FALSE, fig.show="hold"}
+
 hist_ctrl <-  ggplot() + 
   geom_histogram(
-    aes(data_long[treat == 0, sleep_score]),
+    aes(data[, avg_ss_ctrl]),
     fill = "#0099F8",
-    color="black",
-    breaks = seq(30,100,10),
+    color="white",
+    breaks = seq(50,100,5),
     alpha = 0.6) +
   labs(
-    title = "Sleep Score Distribution",
-    subtitle = "Control Phase",
-    x = "Sleep Score",
+    title = "Control Phase",
+    subtitle = "Average Sleep Score Distribution",
+    x = "Average Sleep Score",
     y = "Frequency"
   ) +
   theme_classic() +
   theme(
     plot.title = element_text(color = "#0099F8",
-                              size = 17,
+                              size = 18,
                               face = "bold"),
     plot.subtitle = element_text(color="#969696",
-                                   size = 12, 
+                                   size = 14, 
                                    face = "italic"),
     axis.title = element_text(color = "#969696",
-                              size = 10,
+                              size = 12,
                               face = "bold"),
-    axis.text = element_text(color = "#969696", size = 10),
+    axis.text = element_text(color = "#969696", size = 12),
     axis.line = element_line(color = "#969696"),
-    axis.ticks = element_line(color = "#969696")
+    axis.ticks = element_line(color = data[, .(mean(avg_ss_ctrl))][,V1] - 0.8)
   ) + 
-  xlim(30,100) + 
-  ylim(0,35)
+  geom_vline(xintercept = data[, .(mean(avg_ss_ctrl))][,V1], 
+             linetype = "dashed", color = "#001F82", size = 1) +
+  annotate(
+    geom='text', x = data[, .(mean(avg_ss_ctrl))][,V1] - 1, 
+    y= 8, label=TeX("$\\mu", output='character'), 
+    parse=TRUE, color= "#001F82", size = 7) +
+  annotate(
+    geom='text', x = data[, .(mean(avg_ss_ctrl))][,V1] - 0.8, 
+    y= -0.1, label = round(data[, .(mean(avg_ss_ctrl))][,V1],2), 
+    parse=TRUE, color= "#001F82", size = 7) +
+  xlim(50,100) + 
+  ylim(0,8) + 
+  scale_x_continuous(breaks = c(50,60,70,data[, .(mean(avg_ss_ctrl))][,V1], 80,90,100), labels = c("50","60","70",round(data[, .(mean(avg_ss_ctrl))][,V1],1), "80","90","100")) +
+  theme(axis.text.x = element_text(color = c("#969696", "#969696", "#969696","#001F82", "#969696","#969696","#969696")),
+        axis.ticks.x = element_line(color = c("#969696","#969696","#969696","#001F82", "#969696","#969696","#969696")))
 
 hist_treat <-  ggplot() + 
   geom_histogram(
-    aes(data_long[treat == 1, sleep_score]),
+    aes(data[, avg_ss_treat]),
     fill = "#0099F8",
-    color="black",
-    breaks = seq(30,100,10),
+    color="white",
+    breaks = seq(50,100,5),
     alpha = 0.6) +
   labs(
-    title = "Sleep Score Distribution",
-    subtitle = "Treatment Phase",
-    x = "Sleep Score",
+    title = "Treatment Phase",
+    subtitle = "Average Sleep Score Distribution",
+    x = "Average Sleep Score",
     y = "Frequency"
   ) +
   theme_classic() +
   theme(
     plot.title = element_text(color = "#0099F8",
-                              size = 17,
+                              size = 18,
                               face = "bold"),
     plot.subtitle = element_text(color="#969696",
-                                   size = 12, 
+                                   size = 14, 
                                    face = "italic"),
     axis.title = element_text(color = "#969696",
-                              size = 10,
+                              size = 12,
                               face = "bold"),
-    axis.text = element_text(color = "#969696", size = 10),
+    axis.text = element_text(color = "#969696", size = 12),
     axis.line = element_line(color = "#969696"),
     axis.ticks = element_line(color = "#969696")
   ) + 
-  xlim(30,100) +
-  ylim(0,35)
+  geom_vline(xintercept = data[, .(mean(avg_ss_treat))][,V1], 
+             linetype = "dashed", color = "#001F82", size = 1) +
+  annotate(
+    geom='text', x = data[, .(mean(avg_ss_treat))][,V1] - 1, 
+    y= 8, label=TeX("$\\mu", output='character'), 
+    parse=TRUE, color= "#001F82", size = 7) +
+  annotate(
+    geom='text', x = data[, .(mean(avg_ss_treat))][,V1] - 0.9, 
+    y= -0.01, label = round(data[, .(mean(avg_ss_treat))][,V1],2), 
+    parse=TRUE, color= "#001F82", size = 4) +
+  xlim(50,100) +
+  ylim(0,8) + 
+  scale_x_continuous(breaks = c(50,60,70,data[, .(mean(avg_ss_treat))][,V1], 80,90,100), labels = c("50","60","70",round(data[, .(mean(avg_ss_treat))][,V1],1), "80","90","100")) +
+  theme(axis.text.x = element_text(color = c("#969696", "#969696", "#969696","#001F82", "#969696","#969696","#969696")),
+        axis.ticks.x = element_line(color = c("#969696","#969696","#969696","#001F82", "#969696","#969696","#969696")))
 
 hist_ctrl
 hist_treat
@@ -274,14 +301,16 @@ week_treat <- data_long[ , .(
   ),
   keyby = c('treat', 'week', 'Assignment')]
 
-week_treat[treat == 0, Treat := "Control"]
-week_treat[treat == 1, Treat := "Treatment"]
+week_treat[treat == 0, Phase := "Control"]
+week_treat[treat == 1, Phase := "Treatment"]
+week_treat[Assignment == 'ctrl-treat', Assignment := "Control-Treat"]
+week_treat[Assignment == 'treat-ctrl', Assignment := "Treat-Control"]
 
 ggplot(week_treat) + 
   geom_point(
     aes(x = week, 
         y = sleep_score,
-        shape = Treat,
+        shape = Phase,
         color = Assignment),
     size = 5
     ) +
@@ -297,17 +326,51 @@ ggplot(week_treat) +
   )+
   theme(
     plot.title = element_text(color = "#0099F8",
-                              size = 17,
+                              size = 18,
                               face = "bold"),
-    plot.subtitle = element_text(size = 13, 
+    plot.subtitle = element_text(size = 14, 
                                  face = "italic",
                                  color="#969696"),
     axis.title = element_text(color = "#969696",
-                              size = 10,
+                              size = 12,
                               face = "bold"),
     axis.text = element_text(color = "#969696", size = 10),
     axis.line = element_line(color = "#969696"),
-    axis.ticks = element_line(color = "#969696")
+    axis.ticks = element_line(color = "#969696"),
+    legend.title = element_text(face = "bold")
+  ) + scale_color_manual(values=c('tomato1', '#0099F8')) +
+  scale_x_continuous(breaks = c(1,2))
+```
+
+```{r}
+ggplot(data_long,
+       aes(y = sleep_score, phase_sq)) +
+  ggtitle("Subjective Score vs Device") + 
+  xlab("Subjective Sleep Quality") + 
+  ylab("Sleep Score") +
+  geom_point(
+    alpha = 0.4,
+    size = 2,
+    color = "#969696"
+  ) +
+  stat_summary(aes(y = sleep_score,group=1),
+               fun.y=mean, colour="#0099F8", geom="line",
+               group=1, size = 1.5) +
+  theme_classic() +
+  theme(
+    plot.title = element_text(color = "#0099F8",
+                              size = 18,
+                              face = "bold"),
+    plot.subtitle = element_text(size = 14, 
+                                 face = "italic",
+                                 color="#969696"),
+    axis.title = element_text(color = "#969696",
+                              size = 12,
+                              face = "bold"),
+    axis.text = element_text(color = "#969696", size = 10),
+    axis.line = element_line(color = "#969696"),
+    axis.ticks = element_line(color = "#969696"),
+    legend.title = element_text(face = "bold")
   )
 ```
 

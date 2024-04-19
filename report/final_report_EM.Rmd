@@ -6,7 +6,10 @@ date: "4/18/2024"
 output:
   pdf_document:
     number_sections: yes
-    fig_caption: True 
+    fig_caption: True
+header-includes:
+   - \usepackage{rotating, graphicx}
+   - \usepackage{multirow}
 ---
 
 ```{r global options, include = FALSE}
@@ -21,45 +24,58 @@ knitr::knit_engines$set(problem_description = function(options) {
 library(data.table)
 library(sandwich)
 library(lmtest)
+library(ggplot2)
 library(knitr)
 library(stargazer)
+library(kableExtra)
+library(dplyr)
+library(ggpubr)
+library(latex2exp)
 ```
 
 ```{r models, include=FALSE}
+# Short Format Table
 data <- fread("../data/cleaned_data.csv")
 data[, avg_ss := rowMeans(.SD, na.rm = TRUE), .SDcols = c("day1_ss", "day2_ss", "day3_ss", "day4_ss")]
 
+# Long Format Table
+data_long <- fread("../data/cleaned_data_long.csv")
+data_long <- na.omit(data_long)
 
+# Paired data
+data_pair <- fread("../data/paired_cleaned_data.csv")
+data_pair[, avg_ss_ctrl := rowMeans(.SD, na.rm = TRUE), .SDcols = c("day1_ss_ctrl", "day2_ss_ctrl", "day3_ss_ctrl", "day4_ss_ctrl")]
+data_pair[, avg_ss_treat := rowMeans(.SD, na.rm = TRUE), .SDcols = c("day1_ss_treat", "day2_ss_treat", "day3_ss_treat", "day4_ss_treat")]
+
+# Base Model
 model_base <- lm(avg_ss ~ treat, data = data)
 robust_base <- sqrt(diag(vcovHC(model_base, type="HC1")))
 
+# Model adding with participants' Demographic Info
 model_prevsleep <- lm(avg_ss ~ treat + sleep_quality + 
                         trouble_sleep + total_sleep, 
                       data = data)
 robust_prevsleep <- sqrt(diag(vcovHC(model_prevsleep, type="HC1")))
 
+# Model adding with participants' Demographic Info
 model_demog <- lm(
   avg_ss ~ treat + sleep_quality + trouble_sleep + 
     total_sleep + age_group + gender, 
   data = data)
 robust_demog <- sqrt(diag(vcovHC(model_demog, type="HC1")))
 
-model_complete <- lm(
-  avg_ss ~ treat + as.factor(participant_id), 
+# Model with participants' Fixed Effects
+model_fixed <- lm(
+  avg_ss ~ treat + as.factor(participant_id),
   data = data)
-robust_complete <- sqrt(diag(vcovHC(model_complete, type="HC1")))
-```
+robust_complete <- sqrt(diag(vcovHC(model_fixed, type="HC1")))
 
-```{r}
-library(gmodels)
-
-CrossTable(data$gender, data$age_group)
-
-mydata <- data
-
-xtabs(~ gender + age_group, data=data)
-
-stargazer(mydata, type = "text", title="Descriptive statistics", digits=1)
+# Model with participants' individual data points
+# data_long$participant_id <- factor(data_long$participant_id)
+model_individual <- lm(
+  sleep_score ~ treat + as.factor(participant_id), 
+  data = data_long)
+robust_individual <- sqrt(diag(vcovHC(model_individual, type="HC1")))
 ```
 
 
@@ -67,25 +83,22 @@ stargazer(mydata, type = "text", title="Descriptive statistics", digits=1)
 \newpage
 
 \section{Introduction}
-Sleep health is a fundamental aspect of maintaining general good health and cognitive performance [2]. We are interested in the effect of visible light on sleep quality from artificial light sources like ceiling lights and electronic devices. Human’s natural circadian rhythms follow a light-darkness diurnal pattern that are disrupted due to the modern abundance of artificial lighting, which have been found to increase the likelihood of developing sleep disorders [1]. Other studies have found that visible light exposure prior to bedtime can suppress the onset of melatonin production, which can impact sleep quality [3]. Previous studies on this subject have predominantly focused on the effect of blue light from electronic devices. [4] examined the effect of electronic device usage within two hours before bedtime in university students in an observational study. Students were recruited and surveyed on their electronic device usage, sleep quality, depression, lifestyle habits, and demographic characteristics. Similarly, [5] also examined various observational studies on the effect of mobile device usage on both sleep quality and academic performance in high school students. We seek to study if limiting all visible light with the simple use of sunglasses can improve sleep quality.
+Sleep is fundamental to maintaining general health and cognitive performance [2]. We are interested in the effect of visible light on sleep quality from artificial light sources such as indoor lights and electronic devices. Natural circadian rhythms follow a light-darkness diurnal pattern that can be disrupted by the modern abundance of artificial lighting, exposure to which has been found to increase the likelihood of developing sleep disorders [1]. Prior studies have found that visible light exposure prior to bedtime can suppress the onset of melatonin production, which can impact sleep quality [3]. Previous studies on light exposure before sleep have predominantly focused on the effect of blue light emitted by electronic devices. One observational study found that university students who used electronic devices for at least 30 minutes in the two hours before bed experienced poorer sleep quality than those who did not [4]. Students were recruited and surveyed on their electronic device usage, sleep quality, depression, lifestyle, and demographic characteristics. Similarly, a literature review of  [5]  various observational studies on high schoolers’ sleep summarized a series of studies on the effect of mobile device usage on both sleep quality and academic performance. Our focus, instead, is on all sources of visible light. Specifically, we seek to study if limiting all visible light with the simple use of sunglasses can improve sleep quality in adults.  
 
 Our research question is thus posed: **does reducing exposure to visible light by wearing sunglasses one hour before bedtime have an impact on sleep quality?**  
 
-There are several hypotheses that our research question will test:
-\begin{enumerate}
-  \item $H_0$: There is no impact on sleep quality by wearing sunglasses before bedtime.  
-  \item $H_1$: There is an impact on sleep quality by wearing sunglasses before bedtime.
-  \begin{enumerate}
-    \item The impact is positive on sleep quality.  
-    \item The impact is negative on sleep quality.
-  \end{enumerate}
-\end{enumerate}
+We theorize sunglasses limit exposure to visible light, and when worn in the runup to bedtime, mimic a more natural onset of darkness, potentially triggering the biological processes that prepare the brain for sleep. We hypothesize that reducing light exposure before bedtime by wearing sunglasses will have a positive effect on sleep quality.  
 
-We theorize sunglasses limit exposure to visible light, and when worn in the runup to bedtime, mimic a more natural onset of darkness, potentially triggering the biological processes that prepare the brain for sleep. We expect that reducing light exposure before bedtime by wearing sunglasses will have an effect on sleep quality and that effect should be positive.
-
+We pose the null hypothesis to state that sunglasses worn before bedtime have no effect on sleep quality. Our alternative hypothesis is that the intervention has either a positive or negative impact on sleep quality. We account for the potential for sunglasses to negatively impact sleep.  
 
 \section{Experimental Details}
-We recruited subjects to participate in a two-week paired test, during which they tracked their sleep using smart watches for a control phase and a treatment phase. During the control phase, participants went about their normal bedtime routines with the exception of wearing their smartwatch to sleep. During the treatment phase, participants put on a pair of sunglasses one hour before their typical bedtime, went about their normal bedtime routine, and wore their smartwatch to sleep. Each phase was 4 days long, Monday through Thursday with a 3 day break in between each phase. This was to mitigate potential variance from irregular sleep habits on weekends and carryover effects from the different phases. At the end of each phase, participants were asked to report:
+In this experiment, we tested the intervention of wearing sunglasses for an hour before bedtime on subject sleep quality. To measure sleep quality, we utilized sleep score features provided by common consumer activity trackers. Sleep score is a value from 0-100 calculated from sleep duration, time spent in specific stages of sleep (REM, deep sleep, and light/core sleep), sleep disruptions, breathing, heart rate, sleep movements, gender, and age. We configured a paired design to compare control vs. treatment phase sleep scores of subjects.  
+
+To be eligible for the study, recruits were required to have access to sunglasses and an activity tracker with sleep score. We enrolled 22 subjects on a rolling basis to participate in 2 weeks of study per subject. Using paired design, each subject experienced a control and treatment phase lasting Monday through Thursday night of each week. We limit the study to weeknights to control for different weekend sleep habits. We randomly assigned subjects to either complete the control or treatment phase first based on their order of enrollment. This was to account for any potential order effects. For example, the first participant enrolled was assigned “treatment-control” (i.e., treatment phase for week 1, then control phase for week 2). The second enrolled participant was assigned “control-treatment”, the third “treatment-control”, etc.  
+
+During both control and treatment phases, subjects were instructed to follow their regular bedtime routines while wearing their activity trackers to sleep. In the treatment phase, however, subjects were instructed to also wear sunglasses an hour before bedtime. To encourage compliance and discourage attrition, Subjects were offered a $20 Amazon gift card for completion. Subjects could opt in to receive email reminders of instructions an hour before their bedtime.  
+
+At the end of each phase, participants were asked to report:
 \begin{enumerate}
   \item their sleep scores for the 4 nights
   \item treatment compliance (if during treatment phase)
@@ -93,26 +106,176 @@ We recruited subjects to participate in a two-week paired test, during which the
   \item subjective rating of how easily they fell asleep
 \end{enumerate}
 
-Eligible participants had to possess both sunglasses and a smartwatch that was capable of calculating sleep score\footnote{See Appendix A for full list of eligible smartwatch models}, which is how we operationalize sleep quality. Sleep score is a value calculated from total sleep time, time spent in specific stages of sleep (REM, deep sleep, and light/core sleep), number of night wakings, breathing, heart rate, and movements during the night. Our paired study compared average sleep scores of control vs. treatment phases.  
-
-Each eligible participant was randomly assigned to either complete the control or treatment phase first based on their order of enrollment. This was to account for any potential order effects. For example, the first participant enrolled was assigned “treatment-control” (i.e., treatment phase for week 1, then control phase for week 2). The second enrolled participant was assigned “control-treatment”, the third “treatment-control”, etc. Randomization was confirmed with the sharp null hypothesis test.  
-
-To discourage attrition, participants were incentivized with a $20 Amazon gift card upon return of a complete set of data (sleep scores for both control and treatment phases). To encourage compliance, participants could opt in to receive email reminders to wear their smartwatches and during treatment, sunglasses, an hour before their self-reported bedtime.
-
-From our pre-experiment power calculation based on a small scale pilot study, we estimated a mean control sleep score of 75 with an effect size of 4 and a standard deviation of 5. With a sample size of 30, we would be able to achieve a power of 81.6% with our experiment. Ultimately, twenty-two participants returned complete sets of data, so our experiment has lower power than anticipated, assuming our assumptions about effect size and standard deviation hold.
+From our pre-experiment power calculation based on a small scale pilot study, we estimated a base case of mean control sleep score of 75 with an effect size of 4 and a standard deviation of 5. With a sample size of 30, we would be able to achieve a power of 81.6% with our experiment. Ultimately, 22 participants participated and returned complete sets of data, so our experiment has lower power than anticipated, assuming our assumptions about effect size and standard deviation hold.  
 
 
 \section{Analysis}
 
+In all our regression models, we found the dependent variable and covariates that we examined in this study do not sufficiently explain the observed variation in our outcome of sleep score. The distribution of our outcomes are shown in the plots below.  
 
-```{r regression table, include=TRUE, results='asis', warning = FALSE, echo = FALSE}
+```{r hist-density plots, include=TRUE, out.width="50%", warning=FALSE, echo=FALSE, error=FALSE, fig.show="hold"}
+
+hist_ctrl <-  ggplot() + 
+  geom_histogram(
+    aes(data_pair[, avg_ss_ctrl]),
+    fill = "dimgray",
+    color="white",
+    breaks = seq(50,100,5),
+    alpha = 0.6) +
+  labs(
+    title = "Control Phase",
+    subtitle = "Average Sleep Score Distribution",
+    x = "Average Sleep Score",
+    y = "Frequency"
+  ) +
+  theme_classic() +
+  theme(
+    plot.title = element_text(color = "gray25",
+                              size = 18,
+                              face = "bold"),
+    plot.subtitle = element_text(color="#969696",
+                                   size = 14, 
+                                   face = "italic"),
+    axis.title = element_text(color = "#969696",
+                              size = 12,
+                              face = "bold"),
+    axis.text = element_text(color = "#969696", size = 12),
+    axis.line = element_line(color = "#969696"),
+    axis.ticks = element_line(color = data_pair[, .(mean(avg_ss_ctrl))][,V1] - 0.8)
+  ) + 
+  geom_vline(xintercept = data_pair[, .(mean(avg_ss_ctrl))][,V1], 
+             linetype = "dashed", color = "gray25", size = 1) +
+  annotate(
+    geom='text', x = data_pair[, .(mean(avg_ss_ctrl))][,V1] - 1, 
+    y= 8, label=TeX("$\\mu", output='character'), 
+    parse=TRUE, color= "gray25", size = 7) +
+  annotate(
+    geom='text', x = data_pair[, .(mean(avg_ss_ctrl))][,V1] - 0.8, 
+    y= -0.1, label = round(data_pair[, .(mean(avg_ss_ctrl))][,V1],2), 
+    parse=TRUE, color= "gray25", size = 7) +
+  xlim(50,100) + 
+  ylim(0,8) + 
+  scale_x_continuous(breaks = c(50,60,70,data_pair[, .(mean(avg_ss_ctrl))][,V1], 80,90,100), labels = c("50","60","70",round(data_pair[, .(mean(avg_ss_ctrl))][,V1],1), "80","90","100")) +
+  theme(axis.text.x = element_text(color = c("#969696", "#969696", "#969696","gray25", "#969696","#969696","#969696")),
+        axis.ticks.x = element_line(color = c("#969696","#969696","#969696","gray25", "#969696","#969696","#969696")))
+
+hist_treat <-  ggplot() + 
+  geom_histogram(
+    aes(data_pair[, avg_ss_treat]),
+    fill = "dimgray",
+    color="white",
+    breaks = seq(50,100,5),
+    alpha = 0.6) +
+  labs(
+    title = "Treatment Phase",
+    subtitle = "Average Sleep Score Distribution",
+    x = "Average Sleep Score",
+    y = "Frequency"
+  ) +
+  theme_classic() +
+  theme(
+    plot.title = element_text(color = "gray25",
+                              size = 18,
+                              face = "bold"),
+    plot.subtitle = element_text(color="#969696",
+                                   size = 14, 
+                                   face = "italic"),
+    axis.title = element_text(color = "#969696",
+                              size = 12,
+                              face = "bold"),
+    axis.text = element_text(color = "#969696", size = 12),
+    axis.line = element_line(color = "#969696"),
+    axis.ticks = element_line(color = "#969696")
+  ) + 
+  geom_vline(xintercept = data_pair[, .(mean(avg_ss_treat))][,V1], 
+             linetype = "dashed", color = "gray25", size = 1) +
+  annotate(
+    geom='text', x = data_pair[, .(mean(avg_ss_treat))][,V1] - 1, 
+    y= 8, label=TeX("$\\mu", output='character'), 
+    parse=TRUE, color= "gray25", size = 7) +
+  annotate(
+    geom='text', x = data_pair[, .(mean(avg_ss_treat))][,V1] - 0.9, 
+    y= -0.01, label = round(data_pair[, .(mean(avg_ss_treat))][,V1],2), 
+    parse=TRUE, color= "gray25", size = 4) +
+  xlim(50,100) +
+  ylim(0,8) + 
+  scale_x_continuous(breaks = c(50,60,70,data_pair[, .(mean(avg_ss_treat))][,V1], 80,90,100), labels = c("50","60","70",round(data_pair[, .(mean(avg_ss_treat))][,V1],1), "80","90","100")) +
+  theme(axis.text.x = element_text(color = c("#969696", "#969696", "#969696","gray25", "#969696","#969696","#969696")),
+        axis.ticks.x = element_line(color = c("#969696","#969696","#969696","gray25", "#969696","#969696","#969696")))
+
+hist_ctrl
+hist_treat
+```
+In our first and simplest regression model, “Base Model (1)” in Table 1, we regressed mean sleep score on the binary variable “Sunglasses Treatment”, i.e. whether or not the sunglasses treatment was worn. We find a mean sleep score of 78 in the control phase.  
+
+To estimate average treatment effect, we observe a statistically insignificant coefficient on sunglasses treatment of -0.56 with a robust standard error 3.22, implying that our treatment of wearing sunglasses before bedtime, as administered, does not have an impact on sleep quality as measured by sleep score.  
+
+In our subsequent models, we add additional covariates to regress on. Prior to the study, participants were surveyed to rate their sleep quality, trouble sleeping, and total sleep duration. Our model that includes this “Previous Sleep Info” shows that both historical sleep quality and the total usual number of hours slept per night, as reported by participants, are predictive of sleep score: the standard error of sunglasses treatment decreases. Similarly, in our next model that includes demographic information from participants, mainly age group and gender, we observe that age group is a significant predictor of sleep score. Specifically, lower sleep quality is correlated with a higher age. This improvement in regression is also reflected in the increasing R-squared and F-statistic values as more covariates are added.  
+
+Our fourth and fifth models however, where we factor by each individual participant in the study, gives insight on just how much variation there is in sleep quality/health from individual to individual. In the "Fixed Effects by Participant (4)” model, we see that mean sleep score can be highly impacted either positively or negatively by the individual. This is also the case when we look at individual rather than mean sleep score by participant. It is clear variables unobserved by this study’s scope contribute heavily to an individual’s sleep quality, for example, lifestyle, health history, etc.  
+
+Given the null result from our sunglasses treatment, we also examined other potential sources of effect. Because subjects experienced control and treatment phases in different orders, we examined whether sleep score was correlated with time. The motivating theory for this was that by the second week of the experiment, participants may have gained some level of awareness of their sleep habits due to participation and tracking and either consciously or unconsciously began to engage in sleep behaviors that could mute treatment effect. We find that although there was an average increase in sleep score over time, regardless of phase order, no statistically significant result was observed. No significant result was observed.  
+
+```{r lineplot, include=TRUE, warning=FALSE, render=FALSE, echo=FALSE, error=FALSE, message=FALSE, out.width="70%", fig.align = 'center'}
+week_treat <- data_long[ , .(
+  sleep_score = mean(sleep_score)
+  ),
+  keyby = c('treat', 'week', 'Assignment')]
+
+week_treat[treat == 0, Phase := "Control"]
+week_treat[treat == 1, Phase := "Treatment"]
+week_treat[Assignment == 'ctrl-treat', Assignment := "Control-Treat"]
+week_treat[Assignment == 'treat-ctrl', Assignment := "Treat-Control"]
+
+ggplot(week_treat) + 
+  geom_point(
+    aes(x = week, 
+        y = sleep_score,
+        shape = Phase,
+        color = Assignment),
+    size = 5
+    ) +
+  geom_line(aes(x = week, 
+        y = sleep_score,
+        color = Assignment)) + 
+  theme_classic() +
+  labs(
+    title = "Sleep Score Evolution",
+    subtitle = "Per Week Per Group",
+    x = "Week",
+    y = "Sleep Score"
+  )+
+  theme(
+    plot.title = element_text(color = "gray25",
+                              size = 18,
+                              face = "bold"),
+    plot.subtitle = element_text(size = 14, 
+                                 face = "italic",
+                                 color="#969696"),
+    axis.title = element_text(color = "#969696",
+                              size = 12,
+                              face = "bold"),
+    axis.text = element_text(color = "#969696", size = 10),
+    axis.line = element_line(color = "#969696"),
+    axis.ticks = element_line(color = "#969696"),
+    legend.title = element_text(face = "bold")
+  ) + scale_color_manual(values=c('gray25', 'gray63')) +
+  scale_x_continuous(breaks = c(1,2))
+```
+
+
+Similarly, we also looked at any potential differences in sleep score amongst activity tracker brands. Sleep score calculation is proprietary by brand; however, we made the initial assumption that any differences in calculation across brands would be negligible. We again observed no significant result.  
+
+
+```{r regression table, include=TRUE, warning=FALSE, render=FALSE, echo=FALSE, error=FALSE, message=FALSE, results='asis'}
 stargazer(model_base, 
           model_prevsleep, 
           model_demog,
-          model_complete,
+          model_fixed,
+          model_individual,
           type = 'latex',
-          title='Regression Results of Mean Sleep Score',
-          dep.var.labels = 'Mean Sleep Score',
+          title='Sleep Score Regression Results',
+          dep.var.labels = c('Mean Sleep Score','Sleep Score'),
           order="Constant",
           covariate.labels = c("(Intercept)",
                                "Sunglasses Treatment",
@@ -120,7 +283,7 @@ stargazer(model_base,
                                "Trouble Sleeping",
                                "Typical Total Sleep",
                                "Age Group",
-                               "Gender"
+                               "Gender (Female)"
                                ),
           se = list(robust_base, 
                     robust_prevsleep, 
@@ -128,11 +291,16 @@ stargazer(model_base,
                     robust_complete),
           # column.sep.width = "-10pt",
           # single.row = TRUE,
+          omit = c("participant_id"),
+          add.lines=list(c('Participant Fixed effects',
+                           'No', 'No', 'No', 'Yes', 'Yes')),
           column.labels = c("Base Model", 
                             "Previous Sleep Info",
                             "Demographic Info",
-                            "Cluster by Participant"),
+                            "Fixed Effects by Participant",
+                            "Individual Datapoints"),
           notes = "HC robust standard errors in parantheses.",
+          float.env = "sidewaystable",
           font.size = "small",
           no.space = TRUE,
           header = FALSE
@@ -140,9 +308,14 @@ stargazer(model_base,
 ```
 
 
+
 \section{Conclusion}
 
+We found that, on average, participants did not experience a statistically significant effect on sleep quality as measured by sleep score while wearing sunglasses before bed. When examining our results on an individual participant level, we find substantial variation by individual. It is thus clear that for any future studies, we would recommend collecting much more extensive health and lifestyle information on participants, increasing the duration of treatment and control measurement periods, and increasing the sample size to account for variance in the population.
+
+\newpage
 \section{Appendix A}
+A list of eligible activity tracker models that have compatible sleep score technology are shown below. Subjects not having access to a device meeting model includability criteria were not accepted for study.  
 \begin{enumerate}
   \item Garmin - certain models, check \href{https://support.garmin.com/en-US/?faq=DWcdBazhr097VgqFufsTk8}{here} for sleep score compatibility
   \item Apple watch - all models
@@ -152,6 +325,44 @@ stargazer(model_base,
   \item Oura - all models
 
 \end{enumerate}
+
+As part of the analysis, we evaluated the correlation between participants’ subjective measures of sleep on a Likert scale and their activity tracker sleep scores. This helps us understand the effectiveness of device sleep scores, which use proprietary formulas with inputs from minimally invasive methods. We find a positive correlation, Adj $R^2$ of 0.17.  
+
+This below graph indicates the mean sleep score at each subjective score of sleep quality. It must be considered that subjective sleep quality is surveyed at the phase level at the end of each phase, so there is potential for availability bias. Additionally, we cannot know if activity sleep scores may have influenced participants’ own subjective measures of sleep. 
+
+```{r scatterplot, include=TRUE, warning=FALSE, render=FALSE, echo=FALSE, error=FALSE, message=FALSE, out.width="70%", fig.align = 'center'}
+ggplot(data_long,
+       aes(y = sleep_score, phase_sq)) +
+  ggtitle("Subjective Score vs Device Score") + 
+  xlab("Subjective Sleep Quality") + 
+  ylab("Sleep Score") +
+  geom_point(
+    alpha = 0.4,
+    size = 2,
+    color = "#969696"
+  ) +
+  stat_summary(aes(y = sleep_score,group=1),
+               fun.y=mean, colour="gray25", geom="line",
+               group=1, size = 1.5) +
+  theme_classic() +
+  theme(
+    plot.title = element_text(color = "gray25",
+                              size = 18,
+                              face = "bold"),
+    plot.subtitle = element_text(size = 14, 
+                                 face = "italic",
+                                 color="#969696"),
+    axis.title = element_text(color = "#969696",
+                              size = 12,
+                              face = "bold"),
+    axis.text = element_text(color = "#969696", size = 10),
+    axis.line = element_line(color = "#969696"),
+    axis.ticks = element_line(color = "#969696"),
+    legend.title = element_text(face = "bold"),
+    panel.grid.major = element_line(color = "gray90")
+  )
+```
+
 
 \section{References}
 1. Blume, C., Garbazza, C., & Spitschan, M. (2019). Effects of light on human circadian rhythms, sleep and mood. Somnologie, 23(3), 147.

@@ -24,15 +24,22 @@ At the end of each phase, participants were asked to report:
 4. subjective rating of how easily they fell asleep
 
 ## Key Learnings
+<img src="regression.png" alt="Regression table." width="800"/>
+
 > **Participants did not experience a statistically significant effect on sleep quality as measured by sleep score while wearing sunglasses before bed.**
+
+To estimate average treatment effect, we observe a statistically insignificant coefficient on sunglasses treatment of -0.56 with a robust standard error 3.22, implying that our treatment of wearing sunglasses before bedtime, as administered, does not have an impact on sleep quality as measured by sleep score.  
+
+In our subsequent models, we add additional covariates to regress on. Prior to the study, participants were surveyed to rate their sleep quality, trouble sleeping, and total sleep duration. Our model that includes this “Previous Sleep Info” shows that both historical sleep quality and the total usual number of hours slept per night, as reported by participants, are predictive of sleep score: the standard error of sunglasses treatment decreases. Similarly, in our next model that includes demographic information from participants, mainly age group and gender, we observe that age group is a significant predictor of sleep score. Specifically, lower sleep quality is correlated with a higher age. This improvement in regression is also reflected in the increasing R-squared and F-statistic values as more covariates are added.  
 
 When examining our results on an individual participant level, we find substantial variation by individual. It is thus clear that for any future studies, we would recommend collecting much more extensive health and lifestyle information on participants, increasing the duration of treatment and control measurement periods, and increasing the sample size to account for variance in the population.
 
 > **The dependent variable and covariates that we examined in this study do not sufficiently explain the observed variation in our outcome of sleep score.**
 
-To estimate average treatment effect, we observe a statistically insignificant coefficient on sunglasses treatment of -0.56 with a robust standard error 3.22, implying that our treatment of wearing sunglasses before bedtime, as administered, does not have an impact on sleep quality as measured by sleep score.  
+<img src="results.png" alt="Results." width="500"/>
 
-In our subsequent models, we add additional covariates to regress on. Prior to the study, participants were surveyed to rate their sleep quality, trouble sleeping, and total sleep duration. Our model that includes this “Previous Sleep Info” shows that both historical sleep quality and the total usual number of hours slept per night, as reported by participants, are predictive of sleep score: the standard error of sunglasses treatment decreases. Similarly, in our next model that includes demographic information from participants, mainly age group and gender, we observe that age group is a significant predictor of sleep score. Specifically, lower sleep quality is correlated with a higher age. This improvement in regression is also reflected in the increasing R-squared and F-statistic values as more covariates are added.  
+Given the null result from our sunglasses treatment, we also examined other potential sources of effect. Because subjects experienced control and treatment phases in different orders, we examined whether sleep score was correlated with time. The motivating theory for this was that by the second week of the experiment, participants may have gained some level of awareness of their sleep habits due to participation and tracking and either consciously or unconsciously began to engage in sleep behaviors that could mute treatment effect. We find that although there was an average increase in sleep score over time, regardless of phase order, no statistically significant result was observed. No significant result was observed.  
+
 
 ## References
 1. Blume, C., Garbazza, C., & Spitschan, M. (2019). Effects of light on human circadian rhythms, sleep and mood. Somnologie, 23(3), 147.
